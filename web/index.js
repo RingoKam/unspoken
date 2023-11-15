@@ -23,11 +23,20 @@ import {
 
 import { Text } from 'troika-three-text';
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
+import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
 
 // Global variables for scene components
-let camera, scene, renderer, controller;
+let camera, scene, renderer;
+let controller1, controller2;
+let hand1, hand2;
+let controllerGrip1, controllerGrip2;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
+
+const handModels = {
+	left: null,
+	right: null
+};
 
 // Initialize and animate the scene
 init();
@@ -117,26 +126,74 @@ function setupARButton() {
  * Sets up the XR controller and its event listeners.
  */
 function setupController() {
-	controller = renderer.xr.getController(0);
-	controller.addEventListener('connected', handleControllerConnected);
-	controller.addEventListener('disconnected', handleControllerDisconnected);
-	controller.addEventListener('selectstart', handleSelectStart);
-	controller.addEventListener('squeezestart', handleSqueezeStart);
-	scene.add(controller);
+	controller1 = renderer.xr.getController(0);
+	scene.add(controller1);
 
+	controller2 = renderer.xr.getController(1);
+	scene.add(controller2);
+	
 	const controllerModelFactory = new XRControllerModelFactory();
-	const controllerGrip = renderer.xr.getControllerGrip(0);
-	controllerGrip.add(
-		controllerModelFactory.createControllerModel(controllerGrip),
-	);
-	scene.add(controllerGrip);
+	const handModelFactory = new XRHandModelFactory();
+	
+	// Hand 1
+	controllerGrip1 = renderer.xr.getControllerGrip(0);
+	controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1));
+	scene.add(controllerGrip1);
 
-	const geometry = new BufferGeometry().setFromPoints([
-		new Vector3(0, 0, 0),
-		new Vector3(0, 0, -1),
-	]);
-	const line = new Line(geometry);
-	renderer.xr.getController(0).add(line);
+	hand1 = renderer.xr.getHand(0);
+	hand1.userData.currentHandModel = 0;
+	
+	scene.add(hand1);
+
+	handModels.left = [
+		handModelFactory.createHandModel(hand1, 'mesh'),
+		handModelFactory.createHandModel(hand1, 'spheres'),
+		handModelFactory.createHandModel(hand1, 'boxes')
+	];
+
+	for (let i = 0; i < 3; i++) {
+
+		const model = handModels.left[i];
+		model.visible = i == 0;
+		hand1.add(model);
+
+	}
+
+	hand1.addEventListener('pinchend', function () {
+
+		handModels.left[this.userData.currentHandModel].visible = false;
+		this.userData.currentHandModel = (this.userData.currentHandModel + 1) % 3;
+		handModels.left[this.userData.currentHandModel].visible = true;
+
+	});
+
+	// Hand 2
+
+	controllerGrip2 = renderer.xr.getControllerGrip(1);
+	controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2));
+	scene.add(controllerGrip2);
+
+	hand2 = renderer.xr.getHand(1);
+	hand2.userData.currentHandModel = 0;
+	scene.add(hand2);
+
+	handModels.right = [
+		handModelFactory.createHandModel(hand2, 'mesh'),
+		handModelFactory.createHandModel(hand2, 'spheres'),
+		handModelFactory.createHandModel(hand2, 'boxes')
+	];
+
+	for (let i = 0; i < 3; i++) {
+		const model = handModels.right[i];
+		model.visible = i == 0;
+		hand2.add(model);
+	}
+
+	hand2.addEventListener('pinchend', function () {
+		handModels.right[this.userData.currentHandModel].visible = false;
+		this.userData.currentHandModel = (this.userData.currentHandModel + 1) % 3;
+		handModels.right[this.userData.currentHandModel].visible = true;
+	});
 }
 
 /**
@@ -264,6 +321,9 @@ function animate() {
  * Render loop for the scene, updating AR functionalities.
  */
 function render() {
+
+	console.log(hand1)
+
 	handlePendingAnchors();
 	ratk.update();
 	updateSemanticLabels();
