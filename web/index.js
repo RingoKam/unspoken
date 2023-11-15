@@ -113,6 +113,7 @@ function setupARButton() {
 			'plane-detection',
 			'hit-test',
 			'mesh-detection',
+			'hand-tracking',
 			'local-floor',
 		],
 		onUnsupported: () => {
