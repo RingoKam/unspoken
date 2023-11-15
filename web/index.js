@@ -23,7 +23,8 @@ import {
 
 import { Text } from 'troika-three-text';
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
-import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
+import { XRHandModelFactory } from 'three/examples/jsm/webxr/XRHandModelFactory.js';
+import { update, loadPose, getMatchedPoses } from './handyworks/build/esm/handy-work.standalone.js';	
 
 // Global variables for scene components
 let camera, scene, renderer;
@@ -54,6 +55,12 @@ function init() {
 	setupController();
 	window.addEventListener('resize', onWindowResize);
 	setupRATK();
+
+	// Load pose
+	loadPose('relax', 'https://localhost:8081/poses/relax.handpose');
+	loadPose('fist', 'https://localhost:8081/poses/fist.handpose');
+	loadPose('flat', 'https://localhost:8081/poses/flat.handpose');
+	loadPose('point', 'https://localhost:8081/poses/point.handpose');
 }
 
 /**
@@ -115,6 +122,7 @@ function setupARButton() {
 			'mesh-detection',
 			'hand-tracking',
 			'local-floor',
+			'hand-tracking'
 		],
 		onUnsupported: () => {
 			arButton.style.display = 'none';
@@ -133,12 +141,12 @@ function setupController() {
 	controller2 = renderer.xr.getController(1);
 	scene.add(controller2);
 	
-	const controllerModelFactory = new XRControllerModelFactory();
+	// const controllerModelFactory = new XRControllerModelFactory();
 	const handModelFactory = new XRHandModelFactory();
 	
 	// Hand 1
 	controllerGrip1 = renderer.xr.getControllerGrip(0);
-	controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1));
+	// controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1));
 	scene.add(controllerGrip1);
 
 	hand1 = renderer.xr.getHand(0);
@@ -152,13 +160,20 @@ function setupController() {
 		handModelFactory.createHandModel(hand1, 'boxes')
 	];
 
-	for (let i = 0; i < 3; i++) {
+	handModels.left[0].visible = true;
+	handModels.left[1].frustumCulled = false;
+	hand1.add(handModels.left[0]);
 
-		const model = handModels.left[i];
-		model.visible = i == 0;
-		hand1.add(model);
 
-	}
+	// for (let i = 0; i < 3; i++) {
+
+	// 	const model = handModels.left[i];
+	// 	model.visible = i == 0;
+	// 	hand1.add(model);
+
+	// }
+
+	console.log(hand1);
 
 	hand1.addEventListener('pinchend', function () {
 
@@ -171,7 +186,7 @@ function setupController() {
 	// Hand 2
 
 	controllerGrip2 = renderer.xr.getControllerGrip(1);
-	controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2));
+	// controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2));
 	scene.add(controllerGrip2);
 
 	hand2 = renderer.xr.getHand(1);
@@ -315,6 +330,7 @@ function onWindowResize() {
  * Animation loop for the scene.
  */
 function animate() {
+	
 	renderer.setAnimationLoop(render);
 }
 
@@ -322,12 +338,19 @@ function animate() {
  * Render loop for the scene, updating AR functionalities.
  */
 function render() {
-
-	console.log(hand1)
-
 	handlePendingAnchors();
 	ratk.update();
 	updateSemanticLabels();
+
+	const session  = renderer.xr.getSession();
+	if (session) {
+		const frame = renderer.xr.getFrame();
+		const referenceSpace = renderer.xr.getReferenceSpace();
+		const xrInputSources = session.inputSources;
+		update(xrInputSources, referenceSpace, frame, (arg) => {
+			console.log(arg);
+		});
+	}
 	renderer.render(scene, camera);
 }
 
