@@ -39,6 +39,7 @@ let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
 let handyLeft, handyRight;
 const groupList = []
+let anchorCreated = false
 
 const successColor = new Color(0x66941B)
 const defaultColor = new Color(0x000000)
@@ -68,7 +69,7 @@ animate();
 function init() {
 	
 	scene = new Scene();
-	setupGroups()
+	// setupGroups()
 	setupCamera();
 	setupLighting();
 	setupRenderer();
@@ -76,13 +77,27 @@ function init() {
 	setupController();
 	window.addEventListener('resize', onWindowResize);
 	setupRATK();
+
 }
 
+let i = 0; 
+   
 // Set up the anchor
 function setupAnchor(anchor) {
+
+	console.log("anchor is being loaded...")
+
 	anchorModel = new Group();
 	anchorText = new Text();
-	// transition to the next state
+
+	anchor.add(anchorText)
+	anchor.add(anchorModel)
+	
+	const questions = fetch('/question.json')
+		.then(response => response.json())
+		.then(data => {
+			setupQuestion(data[i])
+		});
 }
 
 /**
@@ -101,20 +116,31 @@ function setupCamera() {
 	camera.lookAt(new Vector3(0, 0, 0))
 }
 
-function setupScene(data) {
+function setupQuestion(data) {
 	// Read the Data
 	// Replace the answer in the question with _
-	const question = data.question.replace(data.answer, "_")
+	const question = data.word.replace(data.answer, "_")
+
 	// Load the model
-	loader.load('/models/lamp.glb', function (gltf) {
+	anchorText.text = question
+	anchorText.frustumCulled = false	// always render
+	anchorText.fontSize = 1
+	anchorText.position.set(0, 1, 0)
+	anchorText.sync()
+
+	const loader = new GLTFLoader();
+	loader.load(data.model, function (gltf) {
 		const model = gltf.scene;
-		model.scale.set(1, 1, 1)
+		model.scale.set(data.scale, data.scale, data.scale)
 		model.frustumCulled = false	// always render
 		model.position.set(0, 0, -2)
-		scene.add(model);
+		anchorModel.add(model);
 	});
-	anchorText.text = question
-	anchorText.sync()
+
+	console.log("anchor is loaded!")
+	console.log(anchorModel)
+	console.log(anchorText)
+
 	// Animate the model (transition in)
 	// Animate the model (transition out)
 }
@@ -207,12 +233,16 @@ function setupController() {
 	handModels.left[1].frustumCulled = false;
 	hand1.add(handModels.left[0]);
 
-	console.log(hand1);
+	// console.log(hand1);
 
 	hand1.addEventListener('pinchend', function () {
-		handModels.left[this.userData.currentHandModel].visible = false;
-		this.userData.currentHandModel = (this.userData.currentHandModel + 1) % 3;
-		handModels.left[this.userData.currentHandModel].visible = true;
+		if(anchorCreated == false) {
+			pendingAnchorData = {
+				position: hand1.position.clone(),
+				quaternion: hand1.quaternion.clone(),
+			};
+			anchorCreated = true;
+		}
 	});
 
 	// Hand 2
@@ -238,9 +268,13 @@ function setupController() {
 	}
 
 	hand2.addEventListener('pinchend', function () {
-		handModels.right[this.userData.currentHandModel].visible = false;
-		this.userData.currentHandModel = (this.userData.currentHandModel + 1) % 3;
-		handModels.right[this.userData.currentHandModel].visible = true;
+		if(anchorCreated == false) {
+			pendingAnchorData = {
+				position: hand1.position.clone(),
+				quaternion: hand1.quaternion.clone(),
+			};
+			anchorCreated = true;
+		}
 	});
 
 	Handy.makeHandy(hand1)
@@ -251,7 +285,7 @@ function setupController() {
 		if(handyLeft) {
 			console.log("found left!")
 			handyLeft.addEventListener("pose changed", (event) => {
-				console.log(event.message)
+				// console.log(event.message)
 			})
 		}
 	}
@@ -260,7 +294,7 @@ function setupController() {
 		if(handyRight) {	
 			console.log("found right!")
 			handyRight.addEventListener("pose changed", (event) => {
-				console.log(event.message)
+				// console.log(event.message)
 			})
 		}
 	}
@@ -325,9 +359,10 @@ function setupRATK() {
 	renderer.xr.addEventListener('sessionstart', () => {
 		setTimeout(() => {
 			ratk.restorePersistentAnchors().then(() => {
-				ratk.anchors.forEach((anchor) => {
-					buildAnchorMarker(anchor, true);
-				});
+				if (ratk.anchors.length > 0) {
+					anchorCreated = true;
+					setupAnchor(ratk.anchors[0]);
+				}
 			});
 		}, 1000);
 		setTimeout(() => {
@@ -437,7 +472,7 @@ function render(arg) {
 		if(handyLeft) {
 			console.log("left hand event registered")
 			handyLeft.addEventListener("pose changed", (event) => {
-				console.log(event.message)
+				// console.log(event.message)
 			})
 		}
 	} else {
@@ -452,7 +487,7 @@ function render(arg) {
 		if(handyRight) {
 			console.log("right hand event registered")
 			handyRight.addEventListener("pose changed", (event) => {
-				console.log(event.message)
+				// console.log(event.message)
 			})
 		}
 	} else {
@@ -474,7 +509,7 @@ function render(arg) {
 				userCorrectAnswerInterval = newInterval > 0 ? newInterval : 0	
 			}
 		}
-		console.log(userCorrectAnswerInterval)
+		// console.log(userCorrectAnswerInterval)
 		handyRight.traverse((child) => { if(child.material) child.material.color = new Color().lerpColors(defaultColor, successColor, userCorrectAnswerInterval / 3000) })
 	}
 
@@ -496,7 +531,7 @@ function handlePendingAnchors() {
 				true,
 			)
 			.then((anchor) => {
-				buildAnchorMarker(anchor, false);
+				setupAnchor(anchor)
 			});
 		pendingAnchorData = null;
 	}
