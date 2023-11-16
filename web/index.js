@@ -10,6 +10,7 @@ import {
 	BoxGeometry,
 	BufferGeometry,
 	DirectionalLight,
+	Group,
 	HemisphereLight,
 	Line,
 	Mesh,
@@ -25,6 +26,8 @@ import { Text } from 'troika-three-text';
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
 import { XRHandModelFactory } from 'three/examples/jsm/webxr/XRHandModelFactory.js';
 import { update, loadPose, getMatchedPoses } from './handyworks/build/esm/handy-work.standalone.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 // Global variables for scene components
 let camera, scene, renderer;
@@ -34,6 +37,7 @@ let controllerGrip1, controllerGrip2;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
 let handyLeft, handyRight;
+const groupList = []
 
 const handModels = {
 	left: null,
@@ -48,7 +52,9 @@ animate();
  * Initializes the scene, camera, renderer, lighting, and AR functionalities.
  */
 function init() {
+	
 	scene = new Scene();
+	setupGroups()
 	setupCamera();
 	setupLighting();
 	setupRenderer();
@@ -57,11 +63,6 @@ function init() {
 	window.addEventListener('resize', onWindowResize);
 	setupRATK();
 
-	// Load pose
-	loadPose('relax', 'https://localhost:8081/poses/relax.handpose');
-	loadPose('fist', 'https://localhost:8081/poses/fist.handpose');
-	loadPose('flat', 'https://localhost:8081/poses/flat.handpose');
-	loadPose('point', 'https://localhost:8081/poses/point.handpose');
 }
 
 /**
@@ -77,6 +78,7 @@ function setupCamera() {
 	// Hack for Handy
 	window.camera = camera;
 	camera.position.set(0, 1.6, 3);
+	camera.lookAt(new Vector3(0, 0, 0))
 }
 
 /**
@@ -309,6 +311,30 @@ function setupRATK() {
 	});
 }
 
+function setupGroups() {
+	const group1 = new Group()
+
+	const text1 = new Text()
+	text1.text = 'L_MP'
+	text1.position.set(-2, 2, -2)
+	text1.frustumCulled = false	// always render
+	text1.fontSize = 1
+
+	group1.add(text1)
+
+	const loader = new GLTFLoader();
+	loader.load('/models/lamp.glb', function (gltf) {
+		const model = gltf.scene;
+		model.scale.set(1, 1, 1)
+		console.log('model==', model)
+		model.frustumCulled = false	// always render
+		model.position.set(0, 0, -2)
+		scene.add(model);
+	});
+
+	scene.add(group1)
+}
+
 /**
  * Handles the addition of a new plane detected by RATK.
  */
@@ -396,7 +422,12 @@ function render() {
 	// if(handyRight && handyLeft) {
 		Handy.update()
 	// }
-	renderer.render(scene, camera);
+	// renderer.render(scene, camera);
+	function animate() {
+		requestAnimationFrame( animate );
+		renderer.render( scene, camera );
+	}
+	animate();
 }
 
 /**
