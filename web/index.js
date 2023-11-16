@@ -20,6 +20,7 @@ import {
 	SphereGeometry,
 	Vector3,
 	WebGLRenderer,
+	Color
 } from 'three';
 import { Handy } from './handy/src/Handy.js'
 import { Text } from 'troika-three-text';
@@ -38,6 +39,19 @@ let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
 let handyLeft, handyRight;
 const groupList = []
+
+const successColor = new Color(0x66941B)
+const defaultColor = new Color(0x000000)
+
+// anchor model for the scene
+let anchorModel, anchorText;
+
+let userCorrectAnswerInterval = 0;
+
+const loader = new GLTFLoader();
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
+loader.setDRACOLoader( dracoLoader );
 
 const handModels = {
 	left: null,
@@ -62,7 +76,13 @@ function init() {
 	setupController();
 	window.addEventListener('resize', onWindowResize);
 	setupRATK();
+}
 
+// Set up the anchor
+function setupAnchor(anchor) {
+	anchorModel = new Group();
+	anchorText = new Text();
+	// transition to the next state
 }
 
 /**
@@ -79,6 +99,24 @@ function setupCamera() {
 	window.camera = camera;
 	camera.position.set(0, 1.6, 3);
 	camera.lookAt(new Vector3(0, 0, 0))
+}
+
+function setupScene(data) {
+	// Read the Data
+	// Replace the answer in the question with _
+	const question = data.question.replace(data.answer, "_")
+	// Load the model
+	loader.load('/models/lamp.glb', function (gltf) {
+		const model = gltf.scene;
+		model.scale.set(1, 1, 1)
+		model.frustumCulled = false	// always render
+		model.position.set(0, 0, -2)
+		scene.add(model);
+	});
+	anchorText.text = question
+	anchorText.sync()
+	// Animate the model (transition in)
+	// Animate the model (transition out)
 }
 
 /**
@@ -169,23 +207,12 @@ function setupController() {
 	handModels.left[1].frustumCulled = false;
 	hand1.add(handModels.left[0]);
 
-
-	// for (let i = 0; i < 3; i++) {
-
-	// 	const model = handModels.left[i];
-	// 	model.visible = i == 0;
-	// 	hand1.add(model);
-
-	// }
-
 	console.log(hand1);
 
 	hand1.addEventListener('pinchend', function () {
-
 		handModels.left[this.userData.currentHandModel].visible = false;
 		this.userData.currentHandModel = (this.userData.currentHandModel + 1) % 3;
 		handModels.left[this.userData.currentHandModel].visible = true;
-
 	});
 
 	// Hand 2
@@ -230,7 +257,7 @@ function setupController() {
 	}
 	if (handyRight) {
 		handyRight = Handy.hands.getRight()
-		if(handyRight) {
+		if(handyRight) {	
 			console.log("found right!")
 			handyRight.addEventListener("pose changed", (event) => {
 				console.log(event.message)
@@ -326,7 +353,6 @@ function setupGroups() {
 	loader.load('/models/lamp.glb', function (gltf) {
 		const model = gltf.scene;
 		model.scale.set(1, 1, 1)
-		console.log('model==', model)
 		model.frustumCulled = false	// always render
 		model.position.set(0, 0, -2)
 		scene.add(model);
@@ -341,7 +367,7 @@ function setupGroups() {
 function handlePlaneAdded(plane) {
 	const mesh = plane.planeMesh;
 	mesh.material = new MeshBasicMaterial({
-		wireframe: true,
+		// wireframe: true,
 		color: Math.random() * 0xffffff,
 	});
 }
@@ -350,22 +376,22 @@ function handlePlaneAdded(plane) {
  * Handles the addition of a new mesh detected by RATK.
  */
 function handleMeshAdded(mesh) {
-	const meshMesh = mesh.meshMesh;
-	meshMesh.material = new MeshBasicMaterial({
-		wireframe: true,
-		color: Math.random() * 0xffffff,
-	});
-	meshMesh.geometry.computeBoundingBox();
-	const semanticLabel = new Text();
-	meshMesh.add(semanticLabel);
-	semanticLabel.text = mesh.semanticLabel;
-	semanticLabel.anchorX = 'center';
-	semanticLabel.anchorY = 'bottom';
-	semanticLabel.fontSize = 0.1;
-	semanticLabel.color = 0x000000;
-	semanticLabel.sync();
-	semanticLabel.position.y = meshMesh.geometry.boundingBox.max.y;
-	mesh.userData.semanticLabelMesh = semanticLabel;
+	// const meshMesh = mesh.meshMesh;
+	// meshMesh.material = new MeshBasicMaterial({
+	// 	// wireframe: true,
+	// 	color: Math.random() * 0xffffff,
+	// });
+	// meshMesh.geometry.computeBoundingBox();
+	// const semanticLabel = new Text();
+	// meshMesh.add(semanticLabel);
+	// semanticLabel.text = mesh.semanticLabel;
+	// semanticLabel.anchorX = 'center';
+	// semanticLabel.anchorY = 'bottom';
+	// semanticLabel.fontSize = 0.1;
+	// semanticLabel.color = 0x000000;
+	// semanticLabel.sync();
+	// semanticLabel.position.y = meshMesh.geometry.boundingBox.max.y;
+	// mesh.userData.semanticLabelMesh = semanticLabel;
 }
 
 /**
@@ -381,14 +407,18 @@ function onWindowResize() {
  * Animation loop for the scene.
  */
 function animate() {
-
 	renderer.setAnimationLoop(render);
 }
+
+let lastTime = 0;
 
 /**
  * Render loop for the scene, updating AR functionalities.
  */
-function render() {
+function render(arg) {
+	const delta = arg - lastTime
+	lastTime = arg
+
 	handlePendingAnchors();
 	ratk.update();
 	updateSemanticLabels();
@@ -405,29 +435,53 @@ function render() {
 	if (handyLeft == null) {
 		handyLeft = Handy.hands.getLeft()
 		if(handyLeft) {
+			console.log("left hand event registered")
 			handyLeft.addEventListener("pose changed", (event) => {
 				console.log(event.message)
 			})
 		}
+	} else {
+		if(handyLeft.isPose('asl a', 3000)) {
+			handyLeft.traverse((child) => { if(child.material) child.material.color = new Color( "green" ) })
+		} else {
+			handyLeft.traverse((child) => { if(child.material) child.material.color = new Color("gray") })
+		}
 	}
-	if (handyRight) {
+	if (handyRight == null) {
 		handyRight = Handy.hands.getRight()
 		if(handyRight) {
+			console.log("right hand event registered")
 			handyRight.addEventListener("pose changed", (event) => {
 				console.log(event.message)
 			})
 		}
+	} else {
+		if(hand2.isPose('asl a', 3000)) {
+			// Get the time away from last frame in threejs
+			userCorrectAnswerInterval += lastTime
+
+			if(userCorrectAnswerInterval > 3000) {
+				// user has held the pose for 3 seconds
+				// transition to the next state
+				// Play success audio 
+				userCorrectAnswerInterval = 3000;
+			}
+
+			// if time reached 3 seconds, then user has held the pose for 3 seconds
+		} else {
+			if(userCorrectAnswerInterval > 0) {
+				const newInterval = userCorrectAnswerInterval - lastTime
+				userCorrectAnswerInterval = newInterval > 0 ? newInterval : 0	
+			}
+		}
+		console.log(userCorrectAnswerInterval)
+		handyRight.traverse((child) => { if(child.material) child.material.color = new Color().lerpColors(defaultColor, successColor, userCorrectAnswerInterval / 3000) })
 	}
 
 	// if(handyRight && handyLeft) {
 		Handy.update()
 	// }
-	// renderer.render(scene, camera);
-	function animate() {
-		requestAnimationFrame( animate );
-		renderer.render( scene, camera );
-	}
-	animate();
+	renderer.render(scene, camera);
 }
 
 /**
