@@ -1,0 +1,12 @@
+[
+    {
+        "word": "LAMP",
+        "answer": "A",
+        "model": "https:localhost:8081/models/lamp.glb"
+    },
+    {
+        "word": "Ball",
+        "answer": "B",
+        "model": "https:localhost:8081/models/ball.glb"
+    }
+]
