@@ -364,10 +364,14 @@ function setupRATK() {
 	renderer.xr.addEventListener('sessionstart', () => {
 		setTimeout(() => {
 			ratk.restorePersistentAnchors().then(() => {
-				if (ratk.anchors.length > 0) {
-					anchorCreated = true;
-					setupAnchor(ratk.anchors[0]);
-				}
+				ratk.anchors.forEach((anchor) => {
+					console.log(anchor.anchorID);
+					ratk.deleteAnchor(anchor);
+				});
+				// if (ratk.anchors.length > 0) {
+				// 	anchorCreated = true;
+				// 	setupAnchor(ratk.anchors[0]);
+				// }
 			});
 		}, 1000);
 		setTimeout(() => {
