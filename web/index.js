@@ -20,11 +20,11 @@ import {
 	Vector3,
 	WebGLRenderer,
 } from 'three';
-
+import { Handy } from './handy/src/Handy.js'
 import { Text } from 'troika-three-text';
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
 import { XRHandModelFactory } from 'three/examples/jsm/webxr/XRHandModelFactory.js';
-import { update, loadPose, getMatchedPoses } from './handyworks/build/esm/handy-work.standalone.js';	
+import { update, loadPose, getMatchedPoses } from './handyworks/build/esm/handy-work.standalone.js';
 
 // Global variables for scene components
 let camera, scene, renderer;
@@ -33,6 +33,7 @@ let hand1, hand2;
 let controllerGrip1, controllerGrip2;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
+let handyLeft, handyRight;
 
 const handModels = {
 	left: null,
@@ -73,6 +74,8 @@ function setupCamera() {
 		0.1,
 		10,
 	);
+	// Hack for Handy
+	window.camera = camera;
 	camera.position.set(0, 1.6, 3);
 }
 
@@ -110,7 +113,7 @@ function setupARButton() {
 	webLaunchButton.onclick = () => {
 		window.open(
 			'https://www.oculus.com/open_url/?url=' +
-				encodeURIComponent(window.location.href),
+			encodeURIComponent(window.location.href),
 		);
 	};
 
@@ -140,10 +143,10 @@ function setupController() {
 
 	controller2 = renderer.xr.getController(1);
 	scene.add(controller2);
-	
+
 	// const controllerModelFactory = new XRControllerModelFactory();
 	const handModelFactory = new XRHandModelFactory();
-	
+
 	// Hand 1
 	controllerGrip1 = renderer.xr.getControllerGrip(0);
 	// controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1));
@@ -151,7 +154,7 @@ function setupController() {
 
 	hand1 = renderer.xr.getHand(0);
 	hand1.userData.currentHandModel = 0;
-	
+
 	scene.add(hand1);
 
 	handModels.left = [
@@ -210,6 +213,28 @@ function setupController() {
 		this.userData.currentHandModel = (this.userData.currentHandModel + 1) % 3;
 		handModels.right[this.userData.currentHandModel].visible = true;
 	});
+
+	Handy.makeHandy(hand1)
+	Handy.makeHandy(hand2)
+
+	if (handyLeft == null) {
+		handyLeft = Handy.hands.getLeft()
+		if(handyLeft) {
+			console.log("found left!")
+			handyLeft.addEventListener("pose changed", (event) => {
+				console.log(event.message)
+			})
+		}
+	}
+	if (handyRight) {
+		handyRight = Handy.hands.getRight()
+		if(handyRight) {
+			console.log("found right!")
+			handyRight.addEventListener("pose changed", (event) => {
+				console.log(event.message)
+			})
+		}
+	}
 }
 
 /**
@@ -330,7 +355,7 @@ function onWindowResize() {
  * Animation loop for the scene.
  */
 function animate() {
-	
+
 	renderer.setAnimationLoop(render);
 }
 
@@ -342,15 +367,35 @@ function render() {
 	ratk.update();
 	updateSemanticLabels();
 
-	const session  = renderer.xr.getSession();
-	if (session) {
-		const frame = renderer.xr.getFrame();
-		const referenceSpace = renderer.xr.getReferenceSpace();
-		const xrInputSources = session.inputSources;
-		update(xrInputSources, referenceSpace, frame, (arg) => {
-			console.log(arg);
-		});
+	const session = renderer.xr.getSession();
+	// if (session) {
+	// 	const frame = renderer.xr.getFrame();
+	// 	const referenceSpace = renderer.xr.getReferenceSpace();
+	// 	const xrInputSources = session.inputSources;
+	// 	update(xrInputSources, referenceSpace, frame, (arg) => {
+	// 		console.log(arg);
+	// 	});
+	// }
+	if (handyLeft == null) {
+		handyLeft = Handy.hands.getLeft()
+		if(handyLeft) {
+			handyLeft.addEventListener("pose changed", (event) => {
+				console.log(event.message)
+			})
+		}
 	}
+	if (handyRight) {
+		handyRight = Handy.hands.getRight()
+		if(handyRight) {
+			handyRight.addEventListener("pose changed", (event) => {
+				console.log(event.message)
+			})
+		}
+	}
+
+	// if(handyRight && handyLeft) {
+		Handy.update()
+	// }
 	renderer.render(scene, camera);
 }
 
