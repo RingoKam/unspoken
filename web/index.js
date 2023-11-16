@@ -20,7 +20,8 @@ import {
 	SphereGeometry,
 	Vector3,
 	WebGLRenderer,
-	Color
+	Color,
+	Box3
 } from 'three';
 import { Handy } from './handy/src/Handy.js'
 import { Text } from 'troika-three-text';
@@ -46,6 +47,7 @@ const defaultColor = new Color(0x000000)
 
 // anchor model for the scene
 let anchorModel, anchorText;
+let text1, group1;
 
 let userCorrectAnswerInterval = 0;
 
@@ -58,6 +60,8 @@ const handModels = {
 	left: null,
 	right: null
 };
+
+let listenPose = false
 
 // Initialize and animate the scene
 init();
@@ -96,7 +100,8 @@ function setupAnchor(anchor) {
 	const questions = fetch('/question.json')
 		.then(response => response.json())
 		.then(data => {
-			setupQuestion(data[i])
+			setupGroups(anchor)
+			// setupQuestion(data[i])
 		});
 }
 
@@ -373,12 +378,11 @@ function setupRATK() {
 	});
 }
 
-function setupGroups() {
-	const group1 = new Group()
-
-	const text1 = new Text()
+function setupGroups(anchor) {
+	group1 = new Group()
+	text1 = new Text()
 	text1.text = 'L_MP'
-	text1.position.set(-2, 2, -2)
+	// text1.position.set(-2, 2, -2)
 	text1.frustumCulled = false	// always render
 	text1.fontSize = 1
 
@@ -387,13 +391,25 @@ function setupGroups() {
 	const loader = new GLTFLoader();
 	loader.load('/models/lamp.glb', function (gltf) {
 		const model = gltf.scene;
+		// Get bounding box of the model 
 		model.scale.set(1, 1, 1)
 		model.frustumCulled = false	// always render
 		model.position.set(0, 0, -2)
-		scene.add(model);
-	});
 
+		const aabb = new Box3();
+		aabb.setFromObject( model );
+
+		const height = (aabb.max.y - aabb.min.y) / 2;
+		model.position.y = height;
+		scene.add(model);
+
+		text1.position.set(0, (aabb.max.y - aabb.min.y), -2)
+	});
+	group1.position.set(anchor.position.x,  anchor.position.y,  anchor.position.z);
 	scene.add(group1)
+
+	// start listening for the pose
+	listenPose = true
 }
 
 /**
@@ -402,7 +418,7 @@ function setupGroups() {
 function handlePlaneAdded(plane) {
 	const mesh = plane.planeMesh;
 	mesh.material = new MeshBasicMaterial({
-		// wireframe: true,
+		wireframe: true,
 		color: Math.random() * 0xffffff,
 	});
 }
@@ -411,22 +427,22 @@ function handlePlaneAdded(plane) {
  * Handles the addition of a new mesh detected by RATK.
  */
 function handleMeshAdded(mesh) {
-	// const meshMesh = mesh.meshMesh;
-	// meshMesh.material = new MeshBasicMaterial({
-	// 	// wireframe: true,
-	// 	color: Math.random() * 0xffffff,
-	// });
-	// meshMesh.geometry.computeBoundingBox();
-	// const semanticLabel = new Text();
-	// meshMesh.add(semanticLabel);
-	// semanticLabel.text = mesh.semanticLabel;
-	// semanticLabel.anchorX = 'center';
-	// semanticLabel.anchorY = 'bottom';
-	// semanticLabel.fontSize = 0.1;
-	// semanticLabel.color = 0x000000;
-	// semanticLabel.sync();
-	// semanticLabel.position.y = meshMesh.geometry.boundingBox.max.y;
-	// mesh.userData.semanticLabelMesh = semanticLabel;
+	const meshMesh = mesh.meshMesh;
+	meshMesh.material = new MeshBasicMaterial({
+		wireframe: true,
+		color: Math.random() * 0xffffff,
+	});
+	meshMesh.geometry.computeBoundingBox();
+	const semanticLabel = new Text();
+	meshMesh.add(semanticLabel);
+	semanticLabel.text = mesh.semanticLabel;
+	semanticLabel.anchorX = 'center';
+	semanticLabel.anchorY = 'bottom';
+	semanticLabel.fontSize = 0.1;
+	semanticLabel.color = 0x000000;
+	semanticLabel.sync();
+	semanticLabel.position.y = meshMesh.geometry.boundingBox.max.y;
+	mesh.userData.semanticLabelMesh = semanticLabel;
 }
 
 /**
@@ -467,6 +483,7 @@ function render(arg) {
 	// 		console.log(arg);
 	// 	});
 	// }
+
 	if (handyLeft == null) {
 		handyLeft = Handy.hands.getLeft()
 		if(handyLeft) {
@@ -475,7 +492,7 @@ function render(arg) {
 				// console.log(event.message)
 			})
 		}
-	} else {
+	} else if(listenPose) {
 		if(handyLeft.isPose('asl a', 3000)) {
 			handyLeft.traverse((child) => { if(child.material) child.material.color = new Color( "green" ) })
 		} else {
@@ -490,7 +507,7 @@ function render(arg) {
 				// console.log(event.message)
 			})
 		}
-	} else {
+	} else if(listenPose) {
 		if(hand2.isPose('asl a', 3000)) {
 			// Get the time away from last frame in threejs
 			userCorrectAnswerInterval += lastTime
@@ -500,6 +517,9 @@ function render(arg) {
 				// transition to the next state
 				// Play success audio 
 				userCorrectAnswerInterval = 3000;
+				text1.text = 'LAMP'
+				text1.sync()
+				// next question
 			}
 
 			// if time reached 3 seconds, then user has held the pose for 3 seconds
