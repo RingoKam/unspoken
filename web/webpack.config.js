@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
 	mode: 'development',
 	entry: {
+		auth: './auth.js',
 		index: './index.js',
 	},
 	module: {
@@ -29,9 +30,23 @@ module.exports = {
 		clean: true,
 	},
 	plugins: [
+		// new HtmlWebpackPlugin({
+		// 	template: './index.html',
+		// }),
+		// new ESLintPlugin(),
 		new HtmlWebpackPlugin({
-			template: './index.html',
+			template: './auth.html',
+			filename: 'index.html',
+			chunks: ['auth']
 		}),
+		new HtmlWebpackPlugin({
+            template: './index.html',
+			filename: 'main.html',
+			chunks: ['main']
+		}),
+		// new CopyPlugin({
+		// 	patterns: [{ from: 'src/assets', to: 'assets' }],
+		// }),
 	],
 	devtool: 'source-map',
 };

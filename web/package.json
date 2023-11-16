@@ -16,6 +16,7 @@
 		"serve": "webpack serve"
 	},
 	"dependencies": {
+		"aws-amplify": "^5.3.11",
 		"ratk": "^0.3.0",
 		"three": "npm:super-three@0.158.0",
 		"troika-three-text": "0.49.0"
