@@ -50,6 +50,8 @@ let anchorModel, anchorText;
 let text1, group1;
 
 let userCorrectAnswerInterval = 0;
+const correctIntervalThreshold = 3000;
+const incorrectAnswerMultipler = 1.5;
 
 const loader = new GLTFLoader();
 const dracoLoader = new DRACOLoader();
@@ -488,21 +490,25 @@ function render(arg) {
 	// 	});
 	// }
 
+	// Let's disable left hand input for now
+	// LEFT HAND
 	if (handyLeft == null) {
 		handyLeft = Handy.hands.getLeft()
-		if(handyLeft) {
-			console.log("left hand event registered")
-			handyLeft.addEventListener("pose changed", (event) => {
-				// console.log(event.message)
-			})
-		}
+		// if(handyLeft) {
+		// 	console.log("left hand event registered")
+		// 	handyLeft.addEventListener("pose changed", (event) => {
+		// 		// console.log(event.message)
+		// 	})
+		// }
 	} else if(listenPose) {
-		if(handyLeft.isPose('asl a', 3000)) {
-			handyLeft.traverse((child) => { if(child.material) child.material.color = new Color( "green" ) })
-		} else {
-			handyLeft.traverse((child) => { if(child.material) child.material.color = new Color("gray") })
-		}
+		// if(handyLeft.isPose('asl a', 3000)) {
+		// 	handyLeft.traverse((child) => { if(child.material) child.material.color = new Color( "green" ) })
+		// } else {
+		// 	handyLeft.traverse((child) => { if(child.material) child.material.color = new Color("gray") })
+		// }
 	}
+
+	// RIGHT HAND
 	if (handyRight == null) {
 		handyRight = Handy.hands.getRight()
 		if(handyRight) {
@@ -515,12 +521,11 @@ function render(arg) {
 		if(hand2.isPose('asl a', 3000)) {
 			// Get the time away from last frame in threejs
 			userCorrectAnswerInterval += lastTime
-
-			if(userCorrectAnswerInterval > 3000) {
+			if(userCorrectAnswerInterval > correctIntervalThreshold) {
 				// user has held the pose for 3 seconds
 				// transition to the next state
 				// Play success audio 
-				userCorrectAnswerInterval = 3000;
+				userCorrectAnswerInterval = correctIntervalThreshold;
 				text1.text = 'LAMP'
 				text1.sync()
 				// next question
@@ -529,17 +534,14 @@ function render(arg) {
 			// if time reached 3 seconds, then user has held the pose for 3 seconds
 		} else {
 			if(userCorrectAnswerInterval > 0) {
-				const newInterval = userCorrectAnswerInterval - lastTime
+				const newInterval = userCorrectAnswerInterval - (lastTime * incorrectAnswerMultipler)
 				userCorrectAnswerInterval = newInterval > 0 ? newInterval : 0	
 			}
 		}
 		// console.log(userCorrectAnswerInterval)
 		handyRight.traverse((child) => { if(child.material) child.material.color = new Color().lerpColors(defaultColor, successColor, userCorrectAnswerInterval / 3000) })
 	}
-
-	// if(handyRight && handyLeft) {
-		Handy.update()
-	// }
+	Handy.update()
 	renderer.render(scene, camera);
 }
 
