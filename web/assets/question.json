@@ -1,0 +1,27 @@
+[
+    {
+        "word": "LAMP",
+        "answer": "A",
+        "model": "/models/lamp.glb"
+    },
+    {
+        "word": "Bear",
+        "answer": "B",
+        "model": "/models/bear.glb" 
+    },
+    {
+        "word": "Cup",
+        "answer": "C",
+        "model": "/models/mug.glb"
+    },
+    {
+        "word": "Dog",
+        "answer": "D",
+        "model": "/models/dog.glb"
+    },
+    {
+        "word": "Tree",
+        "answer": "E",
+        "model": "/models/tree.glb"
+    }
+]
