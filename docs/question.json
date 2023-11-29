@@ -20,7 +20,7 @@
         "model": "/models/dog.glb"
     },
     {
-        "word": "Tree",
+        "word": "TREE",
         "answer": "E",
         "model": "/models/tree.glb"
     }

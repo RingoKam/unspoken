@@ -104,7 +104,7 @@ function setupAnchor(anchor) {
 	group.position.set(0, 0, -2);
 	scene.add(group);
 
-	fetch('/question.json')
+	fetch('./question.json')
 		.then(response => response.json())
 		.then(data => {
 			// setupGroups(anchor)
@@ -145,7 +145,7 @@ function setupQuestion(data) {
 		anchorText.text = "Loading..."
 		anchorText.sync()
 	}
-	loader.load(data.model, function (gltf) {
+	loader.load(`./${data.model}`, function (gltf) {
 		const question = data.word.replace(data.answer, "_")
 		correctAnswer = data.answer
 		anchorText.text = question
