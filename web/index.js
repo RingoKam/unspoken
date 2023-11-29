@@ -460,6 +460,7 @@ function handlePlaneAdded(plane) {
 		wireframe: true,
 		color: Math.random() * 0xffffff,
 	});
+	mesh.visible = false;
 }
 
 /**
@@ -474,14 +475,15 @@ function handleMeshAdded(mesh) {
 	meshMesh.geometry.computeBoundingBox();
 	const semanticLabel = new Text();
 	meshMesh.add(semanticLabel);
-	semanticLabel.text = mesh.semanticLabel;
-	semanticLabel.anchorX = 'center';
-	semanticLabel.anchorY = 'bottom';
-	semanticLabel.fontSize = 0.1;
-	semanticLabel.color = 0x000000;
-	semanticLabel.sync();
-	semanticLabel.position.y = meshMesh.geometry.boundingBox.max.y;
-	mesh.userData.semanticLabelMesh = semanticLabel;
+	meshMesh.visible = false;
+	// semanticLabel.text = mesh.semanticLabel;
+	// semanticLabel.anchorX = 'center';
+	// semanticLabel.anchorY = 'bottom';
+	// semanticLabel.fontSize = 0.1;
+	// semanticLabel.color = 0x000000;
+	// semanticLabel.sync();
+	// semanticLabel.position.y = meshMesh.geometry.boundingBox.max.y;
+	// mesh.userData.semanticLabelMesh = semanticLabel;
 }
 
 /**
