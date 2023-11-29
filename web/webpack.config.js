@@ -39,7 +39,7 @@ module.exports = {
 			patterns: [
 				{
 					from: 'assets',
-					to: 'assets',
+					to: '',
 				},
 			],
 		})
