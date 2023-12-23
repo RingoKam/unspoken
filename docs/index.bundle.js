@@ -7214,6 +7214,891 @@ function callWorker(workerId, action, data) {
 
 /***/ }),
 
+/***/ "./node_modules/@tweenjs/tween.js/dist/tween.esm.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/@tweenjs/tween.js/dist/tween.esm.js ***!
+  \**********************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Easing": () => (/* binding */ Easing),
+/* harmony export */   "Group": () => (/* binding */ Group),
+/* harmony export */   "Interpolation": () => (/* binding */ Interpolation),
+/* harmony export */   "Sequence": () => (/* binding */ Sequence),
+/* harmony export */   "Tween": () => (/* binding */ Tween),
+/* harmony export */   "VERSION": () => (/* binding */ VERSION),
+/* harmony export */   "add": () => (/* binding */ add),
+/* harmony export */   "default": () => (/* binding */ exports),
+/* harmony export */   "getAll": () => (/* binding */ getAll),
+/* harmony export */   "nextId": () => (/* binding */ nextId),
+/* harmony export */   "now": () => (/* binding */ now),
+/* harmony export */   "remove": () => (/* binding */ remove),
+/* harmony export */   "removeAll": () => (/* binding */ removeAll),
+/* harmony export */   "update": () => (/* binding */ update)
+/* harmony export */ });
+/**
+ * The Ease class provides a collection of easing functions for use with tween.js.
+ */
+var Easing = Object.freeze({
+    Linear: Object.freeze({
+        None: function (amount) {
+            return amount;
+        },
+        In: function (amount) {
+            return this.None(amount);
+        },
+        Out: function (amount) {
+            return this.None(amount);
+        },
+        InOut: function (amount) {
+            return this.None(amount);
+        },
+    }),
+    Quadratic: Object.freeze({
+        In: function (amount) {
+            return amount * amount;
+        },
+        Out: function (amount) {
+            return amount * (2 - amount);
+        },
+        InOut: function (amount) {
+            if ((amount *= 2) < 1) {
+                return 0.5 * amount * amount;
+            }
+            return -0.5 * (--amount * (amount - 2) - 1);
+        },
+    }),
+    Cubic: Object.freeze({
+        In: function (amount) {
+            return amount * amount * amount;
+        },
+        Out: function (amount) {
+            return --amount * amount * amount + 1;
+        },
+        InOut: function (amount) {
+            if ((amount *= 2) < 1) {
+                return 0.5 * amount * amount * amount;
+            }
+            return 0.5 * ((amount -= 2) * amount * amount + 2);
+        },
+    }),
+    Quartic: Object.freeze({
+        In: function (amount) {
+            return amount * amount * amount * amount;
+        },
+        Out: function (amount) {
+            return 1 - --amount * amount * amount * amount;
+        },
+        InOut: function (amount) {
+            if ((amount *= 2) < 1) {
+                return 0.5 * amount * amount * amount * amount;
+            }
+            return -0.5 * ((amount -= 2) * amount * amount * amount - 2);
+        },
+    }),
+    Quintic: Object.freeze({
+        In: function (amount) {
+            return amount * amount * amount * amount * amount;
+        },
+        Out: function (amount) {
+            return --amount * amount * amount * amount * amount + 1;
+        },
+        InOut: function (amount) {
+            if ((amount *= 2) < 1) {
+                return 0.5 * amount * amount * amount * amount * amount;
+            }
+            return 0.5 * ((amount -= 2) * amount * amount * amount * amount + 2);
+        },
+    }),
+    Sinusoidal: Object.freeze({
+        In: function (amount) {
+            return 1 - Math.sin(((1.0 - amount) * Math.PI) / 2);
+        },
+        Out: function (amount) {
+            return Math.sin((amount * Math.PI) / 2);
+        },
+        InOut: function (amount) {
+            return 0.5 * (1 - Math.sin(Math.PI * (0.5 - amount)));
+        },
+    }),
+    Exponential: Object.freeze({
+        In: function (amount) {
+            return amount === 0 ? 0 : Math.pow(1024, amount - 1);
+        },
+        Out: function (amount) {
+            return amount === 1 ? 1 : 1 - Math.pow(2, -10 * amount);
+        },
+        InOut: function (amount) {
+            if (amount === 0) {
+                return 0;
+            }
+            if (amount === 1) {
+                return 1;
+            }
+            if ((amount *= 2) < 1) {
+                return 0.5 * Math.pow(1024, amount - 1);
+            }
+            return 0.5 * (-Math.pow(2, -10 * (amount - 1)) + 2);
+        },
+    }),
+    Circular: Object.freeze({
+        In: function (amount) {
+            return 1 - Math.sqrt(1 - amount * amount);
+        },
+        Out: function (amount) {
+            return Math.sqrt(1 - --amount * amount);
+        },
+        InOut: function (amount) {
+            if ((amount *= 2) < 1) {
+                return -0.5 * (Math.sqrt(1 - amount * amount) - 1);
+            }
+            return 0.5 * (Math.sqrt(1 - (amount -= 2) * amount) + 1);
+        },
+    }),
+    Elastic: Object.freeze({
+        In: function (amount) {
+            if (amount === 0) {
+                return 0;
+            }
+            if (amount === 1) {
+                return 1;
+            }
+            return -Math.pow(2, 10 * (amount - 1)) * Math.sin((amount - 1.1) * 5 * Math.PI);
+        },
+        Out: function (amount) {
+            if (amount === 0) {
+                return 0;
+            }
+            if (amount === 1) {
+                return 1;
+            }
+            return Math.pow(2, -10 * amount) * Math.sin((amount - 0.1) * 5 * Math.PI) + 1;
+        },
+        InOut: function (amount) {
+            if (amount === 0) {
+                return 0;
+            }
+            if (amount === 1) {
+                return 1;
+            }
+            amount *= 2;
+            if (amount < 1) {
+                return -0.5 * Math.pow(2, 10 * (amount - 1)) * Math.sin((amount - 1.1) * 5 * Math.PI);
+            }
+            return 0.5 * Math.pow(2, -10 * (amount - 1)) * Math.sin((amount - 1.1) * 5 * Math.PI) + 1;
+        },
+    }),
+    Back: Object.freeze({
+        In: function (amount) {
+            var s = 1.70158;
+            return amount === 1 ? 1 : amount * amount * ((s + 1) * amount - s);
+        },
+        Out: function (amount) {
+            var s = 1.70158;
+            return amount === 0 ? 0 : --amount * amount * ((s + 1) * amount + s) + 1;
+        },
+        InOut: function (amount) {
+            var s = 1.70158 * 1.525;
+            if ((amount *= 2) < 1) {
+                return 0.5 * (amount * amount * ((s + 1) * amount - s));
+            }
+            return 0.5 * ((amount -= 2) * amount * ((s + 1) * amount + s) + 2);
+        },
+    }),
+    Bounce: Object.freeze({
+        In: function (amount) {
+            return 1 - Easing.Bounce.Out(1 - amount);
+        },
+        Out: function (amount) {
+            if (amount < 1 / 2.75) {
+                return 7.5625 * amount * amount;
+            }
+            else if (amount < 2 / 2.75) {
+                return 7.5625 * (amount -= 1.5 / 2.75) * amount + 0.75;
+            }
+            else if (amount < 2.5 / 2.75) {
+                return 7.5625 * (amount -= 2.25 / 2.75) * amount + 0.9375;
+            }
+            else {
+                return 7.5625 * (amount -= 2.625 / 2.75) * amount + 0.984375;
+            }
+        },
+        InOut: function (amount) {
+            if (amount < 0.5) {
+                return Easing.Bounce.In(amount * 2) * 0.5;
+            }
+            return Easing.Bounce.Out(amount * 2 - 1) * 0.5 + 0.5;
+        },
+    }),
+    generatePow: function (power) {
+        if (power === void 0) { power = 4; }
+        power = power < Number.EPSILON ? Number.EPSILON : power;
+        power = power > 10000 ? 10000 : power;
+        return {
+            In: function (amount) {
+                return Math.pow(amount, power);
+            },
+            Out: function (amount) {
+                return 1 - Math.pow((1 - amount), power);
+            },
+            InOut: function (amount) {
+                if (amount < 0.5) {
+                    return Math.pow((amount * 2), power) / 2;
+                }
+                return (1 - Math.pow((2 - amount * 2), power)) / 2 + 0.5;
+            },
+        };
+    },
+});
+
+var now = function () { return performance.now(); };
+
+/**
+ * Controlling groups of tweens
+ *
+ * Using the TWEEN singleton to manage your tweens can cause issues in large apps with many components.
+ * In these cases, you may want to create your own smaller groups of tween
+ */
+var Group = /** @class */ (function () {
+    function Group() {
+        this._tweens = {};
+        this._tweensAddedDuringUpdate = {};
+    }
+    Group.prototype.getAll = function () {
+        var _this = this;
+        return Object.keys(this._tweens).map(function (tweenId) {
+            return _this._tweens[tweenId];
+        });
+    };
+    Group.prototype.removeAll = function () {
+        this._tweens = {};
+    };
+    Group.prototype.add = function (tween) {
+        this._tweens[tween.getId()] = tween;
+        this._tweensAddedDuringUpdate[tween.getId()] = tween;
+    };
+    Group.prototype.remove = function (tween) {
+        delete this._tweens[tween.getId()];
+        delete this._tweensAddedDuringUpdate[tween.getId()];
+    };
+    Group.prototype.update = function (time, preserve) {
+        if (time === void 0) { time = now(); }
+        if (preserve === void 0) { preserve = false; }
+        var tweenIds = Object.keys(this._tweens);
+        if (tweenIds.length === 0) {
+            return false;
+        }
+        // Tweens are updated in "batches". If you add a new tween during an
+        // update, then the new tween will be updated in the next batch.
+        // If you remove a tween during an update, it may or may not be updated.
+        // However, if the removed tween was added during the current batch,
+        // then it will not be updated.
+        while (tweenIds.length > 0) {
+            this._tweensAddedDuringUpdate = {};
+            for (var i = 0; i < tweenIds.length; i++) {
+                var tween = this._tweens[tweenIds[i]];
+                var autoStart = !preserve;
+                if (tween && tween.update(time, autoStart) === false && !preserve) {
+                    delete this._tweens[tweenIds[i]];
+                }
+            }
+            tweenIds = Object.keys(this._tweensAddedDuringUpdate);
+        }
+        return true;
+    };
+    return Group;
+}());
+
+/**
+ *
+ */
+var Interpolation = {
+    Linear: function (v, k) {
+        var m = v.length - 1;
+        var f = m * k;
+        var i = Math.floor(f);
+        var fn = Interpolation.Utils.Linear;
+        if (k < 0) {
+            return fn(v[0], v[1], f);
+        }
+        if (k > 1) {
+            return fn(v[m], v[m - 1], m - f);
+        }
+        return fn(v[i], v[i + 1 > m ? m : i + 1], f - i);
+    },
+    Bezier: function (v, k) {
+        var b = 0;
+        var n = v.length - 1;
+        var pw = Math.pow;
+        var bn = Interpolation.Utils.Bernstein;
+        for (var i = 0; i <= n; i++) {
+            b += pw(1 - k, n - i) * pw(k, i) * v[i] * bn(n, i);
+        }
+        return b;
+    },
+    CatmullRom: function (v, k) {
+        var m = v.length - 1;
+        var f = m * k;
+        var i = Math.floor(f);
+        var fn = Interpolation.Utils.CatmullRom;
+        if (v[0] === v[m]) {
+            if (k < 0) {
+                i = Math.floor((f = m * (1 + k)));
+            }
+            return fn(v[(i - 1 + m) % m], v[i], v[(i + 1) % m], v[(i + 2) % m], f - i);
+        }
+        else {
+            if (k < 0) {
+                return v[0] - (fn(v[0], v[0], v[1], v[1], -f) - v[0]);
+            }
+            if (k > 1) {
+                return v[m] - (fn(v[m], v[m], v[m - 1], v[m - 1], f - m) - v[m]);
+            }
+            return fn(v[i ? i - 1 : 0], v[i], v[m < i + 1 ? m : i + 1], v[m < i + 2 ? m : i + 2], f - i);
+        }
+    },
+    Utils: {
+        Linear: function (p0, p1, t) {
+            return (p1 - p0) * t + p0;
+        },
+        Bernstein: function (n, i) {
+            var fc = Interpolation.Utils.Factorial;
+            return fc(n) / fc(i) / fc(n - i);
+        },
+        Factorial: (function () {
+            var a = [1];
+            return function (n) {
+                var s = 1;
+                if (a[n]) {
+                    return a[n];
+                }
+                for (var i = n; i > 1; i--) {
+                    s *= i;
+                }
+                a[n] = s;
+                return s;
+            };
+        })(),
+        CatmullRom: function (p0, p1, p2, p3, t) {
+            var v0 = (p2 - p0) * 0.5;
+            var v1 = (p3 - p1) * 0.5;
+            var t2 = t * t;
+            var t3 = t * t2;
+            return (2 * p1 - 2 * p2 + v0 + v1) * t3 + (-3 * p1 + 3 * p2 - 2 * v0 - v1) * t2 + v0 * t + p1;
+        },
+    },
+};
+
+/**
+ * Utils
+ */
+var Sequence = /** @class */ (function () {
+    function Sequence() {
+    }
+    Sequence.nextId = function () {
+        return Sequence._nextId++;
+    };
+    Sequence._nextId = 0;
+    return Sequence;
+}());
+
+var mainGroup = new Group();
+
+/**
+ * Tween.js - Licensed under the MIT license
+ * https://github.com/tweenjs/tween.js
+ * ----------------------------------------------
+ *
+ * See https://github.com/tweenjs/tween.js/graphs/contributors for the full list of contributors.
+ * Thank you all, you're awesome!
+ */
+var Tween = /** @class */ (function () {
+    function Tween(_object, _group) {
+        if (_group === void 0) { _group = mainGroup; }
+        this._object = _object;
+        this._group = _group;
+        this._isPaused = false;
+        this._pauseStart = 0;
+        this._valuesStart = {};
+        this._valuesEnd = {};
+        this._valuesStartRepeat = {};
+        this._duration = 1000;
+        this._isDynamic = false;
+        this._initialRepeat = 0;
+        this._repeat = 0;
+        this._yoyo = false;
+        this._isPlaying = false;
+        this._reversed = false;
+        this._delayTime = 0;
+        this._startTime = 0;
+        this._easingFunction = Easing.Linear.None;
+        this._interpolationFunction = Interpolation.Linear;
+        // eslint-disable-next-line
+        this._chainedTweens = [];
+        this._onStartCallbackFired = false;
+        this._onEveryStartCallbackFired = false;
+        this._id = Sequence.nextId();
+        this._isChainStopped = false;
+        this._propertiesAreSetUp = false;
+        this._goToEnd = false;
+    }
+    Tween.prototype.getId = function () {
+        return this._id;
+    };
+    Tween.prototype.isPlaying = function () {
+        return this._isPlaying;
+    };
+    Tween.prototype.isPaused = function () {
+        return this._isPaused;
+    };
+    Tween.prototype.to = function (target, duration) {
+        if (duration === void 0) { duration = 1000; }
+        if (this._isPlaying)
+            throw new Error('Can not call Tween.to() while Tween is already started or paused. Stop the Tween first.');
+        this._valuesEnd = target;
+        this._propertiesAreSetUp = false;
+        this._duration = duration;
+        return this;
+    };
+    Tween.prototype.duration = function (duration) {
+        if (duration === void 0) { duration = 1000; }
+        this._duration = duration;
+        return this;
+    };
+    Tween.prototype.dynamic = function (dynamic) {
+        if (dynamic === void 0) { dynamic = false; }
+        this._isDynamic = dynamic;
+        return this;
+    };
+    Tween.prototype.start = function (time, overrideStartingValues) {
+        if (time === void 0) { time = now(); }
+        if (overrideStartingValues === void 0) { overrideStartingValues = false; }
+        if (this._isPlaying) {
+            return this;
+        }
+        // eslint-disable-next-line
+        this._group && this._group.add(this);
+        this._repeat = this._initialRepeat;
+        if (this._reversed) {
+            // If we were reversed (f.e. using the yoyo feature) then we need to
+            // flip the tween direction back to forward.
+            this._reversed = false;
+            for (var property in this._valuesStartRepeat) {
+                this._swapEndStartRepeatValues(property);
+                this._valuesStart[property] = this._valuesStartRepeat[property];
+            }
+        }
+        this._isPlaying = true;
+        this._isPaused = false;
+        this._onStartCallbackFired = false;
+        this._onEveryStartCallbackFired = false;
+        this._isChainStopped = false;
+        this._startTime = time;
+        this._startTime += this._delayTime;
+        if (!this._propertiesAreSetUp || overrideStartingValues) {
+            this._propertiesAreSetUp = true;
+            // If dynamic is not enabled, clone the end values instead of using the passed-in end values.
+            if (!this._isDynamic) {
+                var tmp = {};
+                for (var prop in this._valuesEnd)
+                    tmp[prop] = this._valuesEnd[prop];
+                this._valuesEnd = tmp;
+            }
+            this._setupProperties(this._object, this._valuesStart, this._valuesEnd, this._valuesStartRepeat, overrideStartingValues);
+        }
+        return this;
+    };
+    Tween.prototype.startFromCurrentValues = function (time) {
+        return this.start(time, true);
+    };
+    Tween.prototype._setupProperties = function (_object, _valuesStart, _valuesEnd, _valuesStartRepeat, overrideStartingValues) {
+        for (var property in _valuesEnd) {
+            var startValue = _object[property];
+            var startValueIsArray = Array.isArray(startValue);
+            var propType = startValueIsArray ? 'array' : typeof startValue;
+            var isInterpolationList = !startValueIsArray && Array.isArray(_valuesEnd[property]);
+            // If `to()` specifies a property that doesn't exist in the source object,
+            // we should not set that property in the object
+            if (propType === 'undefined' || propType === 'function') {
+                continue;
+            }
+            // Check if an Array was provided as property value
+            if (isInterpolationList) {
+                var endValues = _valuesEnd[property];
+                if (endValues.length === 0) {
+                    continue;
+                }
+                // Handle an array of relative values.
+                // Creates a local copy of the Array with the start value at the front
+                var temp = [startValue];
+                for (var i = 0, l = endValues.length; i < l; i += 1) {
+                    var value = this._handleRelativeValue(startValue, endValues[i]);
+                    if (isNaN(value)) {
+                        isInterpolationList = false;
+                        console.warn('Found invalid interpolation list. Skipping.');
+                        break;
+                    }
+                    temp.push(value);
+                }
+                if (isInterpolationList) {
+                    // if (_valuesStart[property] === undefined) { // handle end values only the first time. NOT NEEDED? setupProperties is now guarded by _propertiesAreSetUp.
+                    _valuesEnd[property] = temp;
+                    // }
+                }
+            }
+            // handle the deepness of the values
+            if ((propType === 'object' || startValueIsArray) && startValue && !isInterpolationList) {
+                _valuesStart[property] = startValueIsArray ? [] : {};
+                var nestedObject = startValue;
+                for (var prop in nestedObject) {
+                    _valuesStart[property][prop] = nestedObject[prop];
+                }
+                // TODO? repeat nested values? And yoyo? And array values?
+                _valuesStartRepeat[property] = startValueIsArray ? [] : {};
+                var endValues = _valuesEnd[property];
+                // If dynamic is not enabled, clone the end values instead of using the passed-in end values.
+                if (!this._isDynamic) {
+                    var tmp = {};
+                    for (var prop in endValues)
+                        tmp[prop] = endValues[prop];
+                    _valuesEnd[property] = endValues = tmp;
+                }
+                this._setupProperties(nestedObject, _valuesStart[property], endValues, _valuesStartRepeat[property], overrideStartingValues);
+            }
+            else {
+                // Save the starting value, but only once unless override is requested.
+                if (typeof _valuesStart[property] === 'undefined' || overrideStartingValues) {
+                    _valuesStart[property] = startValue;
+                }
+                if (!startValueIsArray) {
+                    // eslint-disable-next-line
+                    // @ts-ignore FIXME?
+                    _valuesStart[property] *= 1.0; // Ensures we're using numbers, not strings
+                }
+                if (isInterpolationList) {
+                    // eslint-disable-next-line
+                    // @ts-ignore FIXME?
+                    _valuesStartRepeat[property] = _valuesEnd[property].slice().reverse();
+                }
+                else {
+                    _valuesStartRepeat[property] = _valuesStart[property] || 0;
+                }
+            }
+        }
+    };
+    Tween.prototype.stop = function () {
+        if (!this._isChainStopped) {
+            this._isChainStopped = true;
+            this.stopChainedTweens();
+        }
+        if (!this._isPlaying) {
+            return this;
+        }
+        // eslint-disable-next-line
+        this._group && this._group.remove(this);
+        this._isPlaying = false;
+        this._isPaused = false;
+        if (this._onStopCallback) {
+            this._onStopCallback(this._object);
+        }
+        return this;
+    };
+    Tween.prototype.end = function () {
+        this._goToEnd = true;
+        this.update(Infinity);
+        return this;
+    };
+    Tween.prototype.pause = function (time) {
+        if (time === void 0) { time = now(); }
+        if (this._isPaused || !this._isPlaying) {
+            return this;
+        }
+        this._isPaused = true;
+        this._pauseStart = time;
+        // eslint-disable-next-line
+        this._group && this._group.remove(this);
+        return this;
+    };
+    Tween.prototype.resume = function (time) {
+        if (time === void 0) { time = now(); }
+        if (!this._isPaused || !this._isPlaying) {
+            return this;
+        }
+        this._isPaused = false;
+        this._startTime += time - this._pauseStart;
+        this._pauseStart = 0;
+        // eslint-disable-next-line
+        this._group && this._group.add(this);
+        return this;
+    };
+    Tween.prototype.stopChainedTweens = function () {
+        for (var i = 0, numChainedTweens = this._chainedTweens.length; i < numChainedTweens; i++) {
+            this._chainedTweens[i].stop();
+        }
+        return this;
+    };
+    Tween.prototype.group = function (group) {
+        if (group === void 0) { group = mainGroup; }
+        this._group = group;
+        return this;
+    };
+    Tween.prototype.delay = function (amount) {
+        if (amount === void 0) { amount = 0; }
+        this._delayTime = amount;
+        return this;
+    };
+    Tween.prototype.repeat = function (times) {
+        if (times === void 0) { times = 0; }
+        this._initialRepeat = times;
+        this._repeat = times;
+        return this;
+    };
+    Tween.prototype.repeatDelay = function (amount) {
+        this._repeatDelayTime = amount;
+        return this;
+    };
+    Tween.prototype.yoyo = function (yoyo) {
+        if (yoyo === void 0) { yoyo = false; }
+        this._yoyo = yoyo;
+        return this;
+    };
+    Tween.prototype.easing = function (easingFunction) {
+        if (easingFunction === void 0) { easingFunction = Easing.Linear.None; }
+        this._easingFunction = easingFunction;
+        return this;
+    };
+    Tween.prototype.interpolation = function (interpolationFunction) {
+        if (interpolationFunction === void 0) { interpolationFunction = Interpolation.Linear; }
+        this._interpolationFunction = interpolationFunction;
+        return this;
+    };
+    // eslint-disable-next-line
+    Tween.prototype.chain = function () {
+        var tweens = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            tweens[_i] = arguments[_i];
+        }
+        this._chainedTweens = tweens;
+        return this;
+    };
+    Tween.prototype.onStart = function (callback) {
+        this._onStartCallback = callback;
+        return this;
+    };
+    Tween.prototype.onEveryStart = function (callback) {
+        this._onEveryStartCallback = callback;
+        return this;
+    };
+    Tween.prototype.onUpdate = function (callback) {
+        this._onUpdateCallback = callback;
+        return this;
+    };
+    Tween.prototype.onRepeat = function (callback) {
+        this._onRepeatCallback = callback;
+        return this;
+    };
+    Tween.prototype.onComplete = function (callback) {
+        this._onCompleteCallback = callback;
+        return this;
+    };
+    Tween.prototype.onStop = function (callback) {
+        this._onStopCallback = callback;
+        return this;
+    };
+    /**
+     * @returns true if the tween is still playing after the update, false
+     * otherwise (calling update on a paused tween still returns true because
+     * it is still playing, just paused).
+     */
+    Tween.prototype.update = function (time, autoStart) {
+        if (time === void 0) { time = now(); }
+        if (autoStart === void 0) { autoStart = true; }
+        if (this._isPaused)
+            return true;
+        var property;
+        var elapsed;
+        var endTime = this._startTime + this._duration;
+        if (!this._goToEnd && !this._isPlaying) {
+            if (time > endTime)
+                return false;
+            if (autoStart)
+                this.start(time, true);
+        }
+        this._goToEnd = false;
+        if (time < this._startTime) {
+            return true;
+        }
+        if (this._onStartCallbackFired === false) {
+            if (this._onStartCallback) {
+                this._onStartCallback(this._object);
+            }
+            this._onStartCallbackFired = true;
+        }
+        if (this._onEveryStartCallbackFired === false) {
+            if (this._onEveryStartCallback) {
+                this._onEveryStartCallback(this._object);
+            }
+            this._onEveryStartCallbackFired = true;
+        }
+        elapsed = (time - this._startTime) / this._duration;
+        elapsed = this._duration === 0 || elapsed > 1 ? 1 : elapsed;
+        var value = this._easingFunction(elapsed);
+        // properties transformations
+        this._updateProperties(this._object, this._valuesStart, this._valuesEnd, value);
+        if (this._onUpdateCallback) {
+            this._onUpdateCallback(this._object, elapsed);
+        }
+        if (elapsed === 1) {
+            if (this._repeat > 0) {
+                if (isFinite(this._repeat)) {
+                    this._repeat--;
+                }
+                // Reassign starting values, restart by making startTime = now
+                for (property in this._valuesStartRepeat) {
+                    if (!this._yoyo && typeof this._valuesEnd[property] === 'string') {
+                        this._valuesStartRepeat[property] =
+                            // eslint-disable-next-line
+                            // @ts-ignore FIXME?
+                            this._valuesStartRepeat[property] + parseFloat(this._valuesEnd[property]);
+                    }
+                    if (this._yoyo) {
+                        this._swapEndStartRepeatValues(property);
+                    }
+                    this._valuesStart[property] = this._valuesStartRepeat[property];
+                }
+                if (this._yoyo) {
+                    this._reversed = !this._reversed;
+                }
+                if (this._repeatDelayTime !== undefined) {
+                    this._startTime = time + this._repeatDelayTime;
+                }
+                else {
+                    this._startTime = time + this._delayTime;
+                }
+                if (this._onRepeatCallback) {
+                    this._onRepeatCallback(this._object);
+                }
+                this._onEveryStartCallbackFired = false;
+                return true;
+            }
+            else {
+                if (this._onCompleteCallback) {
+                    this._onCompleteCallback(this._object);
+                }
+                for (var i = 0, numChainedTweens = this._chainedTweens.length; i < numChainedTweens; i++) {
+                    // Make the chained tweens start exactly at the time they should,
+                    // even if the `update()` method was called way past the duration of the tween
+                    this._chainedTweens[i].start(this._startTime + this._duration, false);
+                }
+                this._isPlaying = false;
+                return false;
+            }
+        }
+        return true;
+    };
+    Tween.prototype._updateProperties = function (_object, _valuesStart, _valuesEnd, value) {
+        for (var property in _valuesEnd) {
+            // Don't update properties that do not exist in the source object
+            if (_valuesStart[property] === undefined) {
+                continue;
+            }
+            var start = _valuesStart[property] || 0;
+            var end = _valuesEnd[property];
+            var startIsArray = Array.isArray(_object[property]);
+            var endIsArray = Array.isArray(end);
+            var isInterpolationList = !startIsArray && endIsArray;
+            if (isInterpolationList) {
+                _object[property] = this._interpolationFunction(end, value);
+            }
+            else if (typeof end === 'object' && end) {
+                // eslint-disable-next-line
+                // @ts-ignore FIXME?
+                this._updateProperties(_object[property], start, end, value);
+            }
+            else {
+                // Parses relative end values with start as base (e.g.: +10, -3)
+                end = this._handleRelativeValue(start, end);
+                // Protect against non numeric properties.
+                if (typeof end === 'number') {
+                    // eslint-disable-next-line
+                    // @ts-ignore FIXME?
+                    _object[property] = start + (end - start) * value;
+                }
+            }
+        }
+    };
+    Tween.prototype._handleRelativeValue = function (start, end) {
+        if (typeof end !== 'string') {
+            return end;
+        }
+        if (end.charAt(0) === '+' || end.charAt(0) === '-') {
+            return start + parseFloat(end);
+        }
+        return parseFloat(end);
+    };
+    Tween.prototype._swapEndStartRepeatValues = function (property) {
+        var tmp = this._valuesStartRepeat[property];
+        var endValue = this._valuesEnd[property];
+        if (typeof endValue === 'string') {
+            this._valuesStartRepeat[property] = this._valuesStartRepeat[property] + parseFloat(endValue);
+        }
+        else {
+            this._valuesStartRepeat[property] = this._valuesEnd[property];
+        }
+        this._valuesEnd[property] = tmp;
+    };
+    return Tween;
+}());
+
+var VERSION = '21.0.0';
+
+/**
+ * Tween.js - Licensed under the MIT license
+ * https://github.com/tweenjs/tween.js
+ * ----------------------------------------------
+ *
+ * See https://github.com/tweenjs/tween.js/graphs/contributors for the full list of contributors.
+ * Thank you all, you're awesome!
+ */
+var nextId = Sequence.nextId;
+/**
+ * Controlling groups of tweens
+ *
+ * Using the TWEEN singleton to manage your tweens can cause issues in large apps with many components.
+ * In these cases, you may want to create your own smaller groups of tweens.
+ */
+var TWEEN = mainGroup;
+// This is the best way to export things in a way that's compatible with both ES
+// Modules and CommonJS, without build hacks, and so as not to break the
+// existing API.
+// https://github.com/rollup/rollup/issues/1961#issuecomment-423037881
+var getAll = TWEEN.getAll.bind(TWEEN);
+var removeAll = TWEEN.removeAll.bind(TWEEN);
+var add = TWEEN.add.bind(TWEEN);
+var remove = TWEEN.remove.bind(TWEEN);
+var update = TWEEN.update.bind(TWEEN);
+var exports = {
+    Easing: Easing,
+    Group: Group,
+    Interpolation: Interpolation,
+    now: now,
+    Sequence: Sequence,
+    nextId: nextId,
+    Tween: Tween,
+    VERSION: VERSION,
+    getAll: getAll,
+    removeAll: removeAll,
+    add: add,
+    remove: remove,
+    update: update,
+};
+
+
+
+
+/***/ }),
+
 /***/ "./node_modules/bidi-js/dist/bidi.mjs":
 /*!********************************************!*\
   !*** ./node_modules/bidi-js/dist/bidi.mjs ***!
@@ -69211,19 +70096,14 @@ var __webpack_exports__ = {};
   \******************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ratk__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ratk */ "./node_modules/ratk/lib/index.js");
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var _handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./handy/src/Handy.js */ "./handy/src/Handy.js");
-/* harmony import */ var troika_three_text__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! troika-three-text */ "./node_modules/troika-three-text/dist/troika-three-text.esm.js");
-/* harmony import */ var three_examples_jsm_webxr_XRHandModelFactory_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! three/examples/jsm/webxr/XRHandModelFactory.js */ "./node_modules/three/examples/jsm/webxr/XRHandModelFactory.js");
-/* harmony import */ var _handyworks_build_esm_handy_work_standalone_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./handyworks/build/esm/handy-work.standalone.js */ "./handyworks/build/esm/handy-work.standalone.js");
-/* harmony import */ var three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! three/addons/loaders/GLTFLoader.js */ "./node_modules/three/examples/jsm/loaders/GLTFLoader.js");
-/* harmony import */ var three_addons_loaders_DRACOLoader_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! three/addons/loaders/DRACOLoader.js */ "./node_modules/three/examples/jsm/loaders/DRACOLoader.js");
-/**
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var _tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tweenjs/tween.js */ "./node_modules/@tweenjs/tween.js/dist/tween.esm.js");
+/* harmony import */ var _handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./handy/src/Handy.js */ "./handy/src/Handy.js");
+/* harmony import */ var troika_three_text__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! troika-three-text */ "./node_modules/troika-three-text/dist/troika-three-text.esm.js");
+/* harmony import */ var three_examples_jsm_webxr_XRHandModelFactory_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! three/examples/jsm/webxr/XRHandModelFactory.js */ "./node_modules/three/examples/jsm/webxr/XRHandModelFactory.js");
+/* harmony import */ var _handyworks_build_esm_handy_work_standalone_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./handyworks/build/esm/handy-work.standalone.js */ "./handyworks/build/esm/handy-work.standalone.js");
+/* harmony import */ var three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! three/addons/loaders/GLTFLoader.js */ "./node_modules/three/examples/jsm/loaders/GLTFLoader.js");
+/* harmony import */ var three_addons_loaders_DRACOLoader_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! three/addons/loaders/DRACOLoader.js */ "./node_modules/three/examples/jsm/loaders/DRACOLoader.js");
 
 
 
@@ -69234,11 +70114,20 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+// Game states
+const GAME_STATE = {
+	START: "start",
+	ANSWERING: "ANSWERING",
+	LOADING: "loading",
+	END: "end"
+}
+let gameState = GAME_STATE.START;
 
 // Global variables for scene components
 let camera, scene, renderer;
 let controller1, controller2;
-let hand1, hand2;
+let leftHand, rightHand;
 let controllerGrip1, controllerGrip2;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
@@ -69246,21 +70135,20 @@ let handyLeft, handyRight;
 const groupList = []
 let anchorCreated = false
 
-const successColor = new three__WEBPACK_IMPORTED_MODULE_3__.Color(0x66941B)
-const defaultColor = new three__WEBPACK_IMPORTED_MODULE_3__.Color(0x000000)
+const successColor = new three__WEBPACK_IMPORTED_MODULE_4__.Color(0x66941B)
+const defaultColor = new three__WEBPACK_IMPORTED_MODULE_4__.Color(0x000000)
 
 // anchor model for the scene
 let anchorModel, anchorText;
-let text1, group1;
 
 let questions = [];
 let correctAnswer = null;
 let userCorrectAnswerInterval = 0;
-const correctIntervalThreshold = 3000;
+const correctIntervalThreshold = 1500;
 const incorrectAnswerMultipler = 1.5;
 
-const loader = new three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_4__.GLTFLoader();
-const dracoLoader = new three_addons_loaders_DRACOLoader_js__WEBPACK_IMPORTED_MODULE_5__.DRACOLoader();
+const loader = new three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_5__.GLTFLoader();
+const dracoLoader = new three_addons_loaders_DRACOLoader_js__WEBPACK_IMPORTED_MODULE_6__.DRACOLoader();
 dracoLoader.setDecoderPath('/examples/jsm/libs/draco/');
 loader.setDRACOLoader(dracoLoader);
 
@@ -69279,34 +70167,36 @@ animate();
  * Initializes the scene, camera, renderer, lighting, and AR functionalities.
  */
 function init() {
+	gameState = GAME_STATE.START;
 
-	scene = new three__WEBPACK_IMPORTED_MODULE_3__.Scene();
-	// setupGroups()
+	scene = new three__WEBPACK_IMPORTED_MODULE_4__.Scene();
 	setupCamera();
 	setupLighting();
 	setupRenderer();
 	setupARButton();
 	setupController();
+	setupHandy();
 	window.addEventListener('resize', onWindowResize);
 	setupRATK();
-
 }
 
 let questionIndex = 0;
 
 // Set up the anchor
-function setupAnchor(anchor) {
+function setupQuestionAnchor(anchor) {
 
 	console.log("anchor is being loaded...")
 
-	const group = new three__WEBPACK_IMPORTED_MODULE_3__.Group();
-	anchorModel = new three__WEBPACK_IMPORTED_MODULE_3__.Group();
-	anchorText = new troika_three_text__WEBPACK_IMPORTED_MODULE_6__.Text();
+	const group = new three__WEBPACK_IMPORTED_MODULE_4__.Group();
+	anchorModel = new three__WEBPACK_IMPORTED_MODULE_4__.Group();
+	anchorText = new troika_three_text__WEBPACK_IMPORTED_MODULE_7__.Text();
 
 	group.add(anchorText);
 	group.add(anchorModel);
 	group.position.set(0, 0, -2);
 	scene.add(group);
+
+	gameState = GAME_STATE.LOADING;
 
 	fetch('./question.json')
 		.then(response => response.json())
@@ -69321,7 +70211,7 @@ function setupAnchor(anchor) {
  * Sets up the camera for the scene.
  */
 function setupCamera() {
-	camera = new three__WEBPACK_IMPORTED_MODULE_3__.PerspectiveCamera(
+	camera = new three__WEBPACK_IMPORTED_MODULE_4__.PerspectiveCamera(
 		50,
 		window.innerWidth / window.innerHeight,
 		0.1,
@@ -69330,10 +70220,10 @@ function setupCamera() {
 	// Hack for Handy
 	window.camera = camera;
 	camera.position.set(0, 1.6, 3);
-	camera.lookAt(new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 0))
+	camera.lookAt(new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0))
 }
 
-function setupQuestion(data) {
+async function setupQuestion(data) {
 	// Read the Data
 	// Replace the answer in the question with _
 
@@ -69342,13 +70232,18 @@ function setupQuestion(data) {
 	anchorText.anchorY = 'bottom';
 	anchorText.fontSize = 1
 
-	const loader = new three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_4__.GLTFLoader();
+	const loader = new three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_5__.GLTFLoader();
 	console.log("loading...", data.model)
-	if(anchorModel.children.length > 0) {
+	gameState = GAME_STATE.LOADING;
+	if (anchorModel.children.length > 0) {
+		// play animation 
+		await animateOut(anchorModel)
 		anchorModel.remove(anchorModel.children[0])
 		anchorText.text = "Loading..."
 		anchorText.sync()
 	}
+	// TODO: instead of loading up the question one by one, 
+	// We should load all the question at once to speed things up?
 	loader.load(`./${data.model}`, function (gltf) {
 		const question = data.word.replace(data.answer, "_")
 		correctAnswer = data.answer
@@ -69361,7 +70256,7 @@ function setupQuestion(data) {
 		model.frustumCulled = false	// always render
 		model.position.set(0, 0, 0)
 
-		const aabb = new three__WEBPACK_IMPORTED_MODULE_3__.Box3();
+		const aabb = new three__WEBPACK_IMPORTED_MODULE_4__.Box3();
 		aabb.setFromObject(model);
 
 		// from the box3, get the height of the model and scale it to 1
@@ -69376,8 +70271,10 @@ function setupQuestion(data) {
 		anchorText.position.set(0, (aabb.max.y - aabb.min.y) * scale, -1)
 
 		anchorModel.add(model);
-
-		listenPose = true
+		animateIn(anchorModel).then(() => {
+			listenPose = true
+			gameState = GAME_STATE.ANSWERING;
+		})
 	});
 
 	// console.log("anchor is loaded!")
@@ -69392,8 +70289,8 @@ function setupQuestion(data) {
  * Sets up the lighting for the scene.
  */
 function setupLighting() {
-	scene.add(new three__WEBPACK_IMPORTED_MODULE_3__.HemisphereLight(0x606060, 0x404040));
-	const light = new three__WEBPACK_IMPORTED_MODULE_3__.DirectionalLight(0xffffff);
+	scene.add(new three__WEBPACK_IMPORTED_MODULE_4__.HemisphereLight(0x606060, 0x404040));
+	const light = new three__WEBPACK_IMPORTED_MODULE_4__.DirectionalLight(0xffffff);
 	light.position.set(1, 1, 1).normalize();
 	scene.add(light);
 }
@@ -69402,7 +70299,7 @@ function setupLighting() {
  * Sets up the renderer for the scene.
  */
 function setupRenderer() {
-	renderer = new three__WEBPACK_IMPORTED_MODULE_3__.WebGLRenderer({
+	renderer = new three__WEBPACK_IMPORTED_MODULE_4__.WebGLRenderer({
 		alpha: true,
 		antialias: true,
 		multiviewStereo: true,
@@ -69454,35 +70351,35 @@ function setupController() {
 	scene.add(controller2);
 
 	// const controllerModelFactory = new XRControllerModelFactory();
-	const handModelFactory = new three_examples_jsm_webxr_XRHandModelFactory_js__WEBPACK_IMPORTED_MODULE_7__.XRHandModelFactory();
+	const handModelFactory = new three_examples_jsm_webxr_XRHandModelFactory_js__WEBPACK_IMPORTED_MODULE_8__.XRHandModelFactory();
 
 	// Hand 1
 	controllerGrip1 = renderer.xr.getControllerGrip(0);
 	// controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1));
 	scene.add(controllerGrip1);
 
-	hand1 = renderer.xr.getHand(0);
-	hand1.userData.currentHandModel = 0;
+	leftHand = renderer.xr.getHand(0);
+	leftHand.userData.currentHandModel = 0;
 
-	scene.add(hand1);
+	scene.add(leftHand);
 
 	handModels.left = [
-		handModelFactory.createHandModel(hand1, 'mesh'),
-		handModelFactory.createHandModel(hand1, 'spheres'),
-		handModelFactory.createHandModel(hand1, 'boxes')
+		handModelFactory.createHandModel(leftHand, 'mesh'),
+		handModelFactory.createHandModel(leftHand, 'spheres'),
+		handModelFactory.createHandModel(leftHand, 'boxes')
 	];
 
 	handModels.left[0].visible = true;
 	handModels.left[1].frustumCulled = false;
-	hand1.add(handModels.left[0]);
+	leftHand.add(handModels.left[0]);
 
 	// console.log(hand1);
 
-	hand1.addEventListener('pinchend', function () {
+	leftHand.addEventListener('pinchend', function () {
 		if (anchorCreated == false) {
 			pendingAnchorData = {
-				position: hand1.position.clone(),
-				quaternion: hand1.quaternion.clone(),
+				position: leftHand.position.clone(),
+				quaternion: leftHand.quaternion.clone(),
 			};
 			anchorCreated = true;
 		}
@@ -69494,52 +70391,55 @@ function setupController() {
 	// controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2));
 	scene.add(controllerGrip2);
 
-	hand2 = renderer.xr.getHand(1);
-	hand2.userData.currentHandModel = 0;
-	scene.add(hand2);
+	rightHand = renderer.xr.getHand(1);
+	rightHand.userData.currentHandModel = 0;
+	scene.add(rightHand);
 
 	handModels.right = [
-		handModelFactory.createHandModel(hand2, 'mesh'),
-		handModelFactory.createHandModel(hand2, 'spheres'),
-		handModelFactory.createHandModel(hand2, 'boxes')
+		handModelFactory.createHandModel(rightHand, 'mesh'),
+		handModelFactory.createHandModel(rightHand, 'spheres'),
+		handModelFactory.createHandModel(rightHand, 'boxes')
 	];
 
 	for (let i = 0; i < 3; i++) {
 		const model = handModels.right[i];
 		model.visible = i == 0;
-		hand2.add(model);
+		rightHand.add(model);
 	}
 
-	hand2.addEventListener('pinchend', function () {
+	rightHand.addEventListener('pinchend', function () {
 		if (anchorCreated == false) {
 			pendingAnchorData = {
-				position: hand1.position.clone(),
-				quaternion: hand1.quaternion.clone(),
+				position: leftHand.position.clone(),
+				quaternion: leftHand.quaternion.clone(),
 			};
 			anchorCreated = true;
 		}
 	});
+}
 
-	_handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_1__.Handy.makeHandy(hand1)
-	_handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_1__.Handy.makeHandy(hand2)
+function setupHandy() {
+	// once we make handy
+	_handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__.Handy.makeHandy(leftHand)
+	_handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__.Handy.makeHandy(rightHand)
 
 	if (handyLeft == null) {
-		handyLeft = _handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_1__.Handy.hands.getLeft()
-		if (handyLeft) {
-			console.log("found left!")
-			handyLeft.addEventListener("pose changed", (event) => {
-				// console.log(event.message)
-			})
-		}
+		handyLeft = _handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__.Handy.hands.getLeft()
+		// if (handyLeft) {
+		// 	console.log("found left!")
+		// 	handyLeft.addEventListener("pose changed", (event) => {
+		// 		// console.log(event.message)
+		// 	})
+		// }
 	}
-	if (handyRight) {
-		handyRight = _handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_1__.Handy.hands.getRight()
-		if (handyRight) {
-			console.log("found right!")
-			handyRight.addEventListener("pose changed", (event) => {
-				// console.log(event.message)
-			})
-		}
+	if (handyRight == null) {
+		handyRight = _handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__.Handy.hands.getRight()
+		// if (handyRight) {
+		// 	console.log("found right!")
+		// 	handyRight.addEventListener("pose changed", (event) => {
+		// 		// console.log(event.message)
+		// 	})
+		// }
 	}
 }
 
@@ -69551,12 +70451,12 @@ function handleControllerConnected(event) {
 		.createHitTestTargetFromControllerSpace(event.data.handedness)
 		.then((hitTestTarget) => {
 			this.hitTestTarget = hitTestTarget;
-			const geometry = new three__WEBPACK_IMPORTED_MODULE_3__.SphereGeometry(0.05);
-			const material = new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial({
+			const geometry = new three__WEBPACK_IMPORTED_MODULE_4__.SphereGeometry(0.05);
+			const material = new three__WEBPACK_IMPORTED_MODULE_4__.MeshBasicMaterial({
 				transparent: true,
 				opacity: 0.5,
 			});
-			const hitTestMarker = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(geometry, material);
+			const hitTestMarker = new three__WEBPACK_IMPORTED_MODULE_4__.Mesh(geometry, material);
 			this.hitTestTarget.add(hitTestMarker);
 		});
 }
@@ -69620,47 +70520,12 @@ function setupRATK() {
 	});
 }
 
-function setupGroups(anchor) {
-	group1 = new three__WEBPACK_IMPORTED_MODULE_3__.Group()
-	text1 = new troika_three_text__WEBPACK_IMPORTED_MODULE_6__.Text()
-	text1.text = 'L_MP'
-	// text1.position.set(-2, 2, -2)
-	text1.anchorX = 'center';
-	text1.anchorY = 'bottom';
-	text1.frustumCulled = false	// always render
-	text1.fontSize = 1
-
-	group1.add(text1)
-
-	const loader = new three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_4__.GLTFLoader();
-	loader.load('/models/lamp.glb', function (gltf) {
-		const model = gltf.scene;
-		// Get bounding box of the model 
-		model.scale.set(1, 1, 1)
-		model.frustumCulled = false	// always render
-		model.position.set(0, 0, -2)
-		const aabb = new three__WEBPACK_IMPORTED_MODULE_3__.Box3();
-		aabb.setFromObject(model);
-		const height = (aabb.max.y - aabb.min.y) / 2;
-		model.position.y = height;
-		group1.add(model);
-
-		text1.position.set(0, (aabb.max.y - aabb.min.y), -2)
-	});
-	// TODO: should be directly infront of user
-	group1.position.set(0, 0, -2);
-	scene.add(group1)
-
-	// start listening for the pose
-	listenPose = true
-}
-
 /**
  * Handles the addition of a new plane detected by RATK.
  */
 function handlePlaneAdded(plane) {
 	const mesh = plane.planeMesh;
-	mesh.material = new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial({
+	mesh.material = new three__WEBPACK_IMPORTED_MODULE_4__.MeshBasicMaterial({
 		wireframe: true,
 		color: Math.random() * 0xffffff,
 	});
@@ -69672,12 +70537,12 @@ function handlePlaneAdded(plane) {
  */
 function handleMeshAdded(mesh) {
 	const meshMesh = mesh.meshMesh;
-	meshMesh.material = new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial({
+	meshMesh.material = new three__WEBPACK_IMPORTED_MODULE_4__.MeshBasicMaterial({
 		wireframe: true,
 		color: Math.random() * 0xffffff,
 	});
 	meshMesh.geometry.computeBoundingBox();
-	const semanticLabel = new troika_three_text__WEBPACK_IMPORTED_MODULE_6__.Text();
+	const semanticLabel = new troika_three_text__WEBPACK_IMPORTED_MODULE_7__.Text();
 	meshMesh.add(semanticLabel);
 	meshMesh.visible = false;
 	// semanticLabel.text = mesh.semanticLabel;
@@ -69714,78 +70579,132 @@ let lastTime = 0;
 function render(arg) {
 	const delta = arg - lastTime
 	lastTime = arg
-
+	_tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_1__.update();
 	handlePendingAnchors();
 	ratk.update();
 	updateSemanticLabels();
 
 	const session = renderer.xr.getSession();
-	// if (session) {
-	// 	const frame = renderer.xr.getFrame();
-	// 	const referenceSpace = renderer.xr.getReferenceSpace();
-	// 	const xrInputSources = session.inputSources;
-	// 	update(xrInputSources, referenceSpace, frame, (arg) => {
-	// 		console.log(arg);
-	// 	});
-	// }
 
+	// TODO: there are some logic here that we use to setup the hands
+	// maybe we can move this to a separate function
 	// Let's disable left hand input for now
 	// LEFT HAND
-	if (handyLeft == null) {
-		handyLeft = _handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_1__.Handy.hands.getLeft()
-		// if(handyLeft) {
-		// 	console.log("left hand event registered")
-		// 	handyLeft.addEventListener("pose changed", (event) => {
-		// 		// console.log(event.message)
-		// 	})
-		// }
-	} else if (listenPose) {
-		// if(handyLeft.isPose('asl a', 3000)) {
-		// 	handyLeft.traverse((child) => { if(child.material) child.material.color = new Color( "green" ) })
-		// } else {
-		// 	handyLeft.traverse((child) => { if(child.material) child.material.color = new Color("gray") })
-		// }
-	}
+	// if (handyLeft == null) {
+	// 	handyLeft = Handy.hands.getLeft()
+	// 	// if(handyLeft) {
+	// 	// 	console.log("left hand event registered")
+	// 	// 	handyLeft.addEventListener("pose changed", (event) => {
+	// 	// 		// console.log(event.message)
+	// 	// 	})
+	// 	// }
+	// } else if (listenPose) {
+	// 	// if(handyLeft.isPose('asl a', 3000)) {
+	// 	// 	handyLeft.traverse((child) => { if(child.material) child.material.color = new Color( "green" ) })
+	// 	// } else {
+	// 	// 	handyLeft.traverse((child) => { if(child.material) child.material.color = new Color("gray") })
+	// 	// }
+	// }
 
 	// RIGHT HAND
+	// if (handyRight == null) {
+	// 	handyRight = Handy.hands.getRight()
+	// 	if (handyRight) {
+	// 		console.log("right hand event registered")
+	// 		handyRight.addEventListener("pose changed", (event) => {
+	// 			console.log(event.message)
+	// 		})
+	// 	}
+	// } else if (listenPose) {
+	// 	if (rightHand.isPose(`asl ${correctAnswer?.toLowerCase()}`, 3000)) {
+	// 		// Get the time away from last frame in threejs
+	// 		userCorrectAnswerInterval += lastTime
+	// 		if (userCorrectAnswerInterval > correctIntervalThreshold) {
+	// 			// user has held the pose for 3 seconds
+	// 			// transition to the next state
+	// 			// Play success audio 
+	// 			listenPose = false
+	// 			userCorrectAnswerInterval = correctIntervalThreshold;
+	// 			anchorText.text = anchorText.text.replace("_", correctAnswer)
+	// 			anchorText.sync()
+	// 			// next question
+	// 			setTimeout(() => {
+	// 				questionIndex += 1
+	// 				setupQuestion(questions[questionIndex])
+	// 			}, 3000);
+	// 		}
+	// 		// if time reached 3 seconds, then user has held the pose for 3 seconds
+	// 	} else {
+	// 		if (userCorrectAnswerInterval > 0) {
+	// 			const newInterval = userCorrectAnswerInterval - (lastTime * incorrectAnswerMultipler)
+	// 			userCorrectAnswerInterval = newInterval > 0 ? newInterval : 0
+	// 		}
+	// 	}
+	// 	// console.log(userCorrectAnswerInterval)
+	// 	handyRight.traverse((child) => { if (child.material) child.material.color = new Color().lerpColors(defaultColor, successColor, userCorrectAnswerInterval / 3000) })
+	// }
+
+	if (gameState == GAME_STATE.ANSWERING) {
+		// here we start listening to the pose
+		listenRightHand(delta);
+	}
+
+	_handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__.Handy.update()
+	renderer.render(scene, camera);
+}
+
+function listenRightHand(delta) {
 	if (handyRight == null) {
-		handyRight = _handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_1__.Handy.hands.getRight()
-		if (handyRight) {
-			console.log("right hand event registered")
-			handyRight.addEventListener("pose changed", (event) => {
-				console.log(event.message)
-			})
-		}
-	} else if (listenPose) {
-		if (hand2.isPose(`asl ${correctAnswer?.toLowerCase()}`, 3000)) {
+		handyRight = _handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__.Handy.hands.getRight();
+	}
+
+	if (handyRight != null) {
+		// Right Hand... 
+		if (rightHand.isPose(`asl ${correctAnswer?.toLowerCase()}`, 3000)) {
 			// Get the time away from last frame in threejs
-			userCorrectAnswerInterval += lastTime
+			userCorrectAnswerInterval += delta;
 			if (userCorrectAnswerInterval > correctIntervalThreshold) {
-				// user has held the pose for 3 seconds
+				// user has held the pose for 1.5 seconds
 				// transition to the next state
-				// Play success audio 
-				listenPose = false
-				userCorrectAnswerInterval = correctIntervalThreshold;
-				anchorText.text = anchorText.text.replace("_", correctAnswer)
-				anchorText.sync()
-				// next question
-				setTimeout(() => {
-					questionIndex += 1
-					setupQuestion(questions[questionIndex])
-				}, 3000);
+				if (questionIndex == questions.length - 1) {
+					endGame();
+				} else {
+					nextQuestion();
+				}
 			}
 			// if time reached 3 seconds, then user has held the pose for 3 seconds
 		} else {
 			if (userCorrectAnswerInterval > 0) {
-				const newInterval = userCorrectAnswerInterval - (lastTime * incorrectAnswerMultipler)
-				userCorrectAnswerInterval = newInterval > 0 ? newInterval : 0
+				const newInterval = userCorrectAnswerInterval - (delta * incorrectAnswerMultipler);
+				userCorrectAnswerInterval = newInterval > 0 ? newInterval : 0;
 			}
 		}
-		// console.log(userCorrectAnswerInterval)
-		handyRight.traverse((child) => { if (child.material) child.material.color = new three__WEBPACK_IMPORTED_MODULE_3__.Color().lerpColors(defaultColor, successColor, userCorrectAnswerInterval / 3000) })
+		handyRight?.traverse((child) => { if (child.material) child.material.color = new three__WEBPACK_IMPORTED_MODULE_4__.Color().lerpColors(defaultColor, successColor, userCorrectAnswerInterval / correctIntervalThreshold); });
 	}
-	_handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_1__.Handy.update()
-	renderer.render(scene, camera);
+}
+
+function endGame() {
+	gameState = GAME_STATE.END;
+
+	animateOut(anchorModel).then(() => {
+		anchorModel.remove(anchorModel.children[0])
+		anchorText.text = "Thanks for Playing";
+		anchorText.sync();
+	})	
+}
+
+function nextQuestion() {
+	listenPose = false;
+	gameState = GAME_STATE.LOADING;
+	userCorrectAnswerInterval = correctIntervalThreshold;
+	anchorText.text = anchorText.text.replace("_", correctAnswer);
+	anchorText.sync();
+	//todo: play success audio
+	// next question
+	setTimeout(() => {
+		questionIndex += 1;
+		setupQuestion(questions[questionIndex]);
+	}, 1000);
 }
 
 /**
@@ -69800,18 +70719,20 @@ function handlePendingAnchors() {
 				true,
 			)
 			.then((anchor) => {
-				setupAnchor(anchor)
+				setupQuestionAnchor(anchor)
 			});
 		pendingAnchorData = null;
 	}
 }
 
+// This is from the sample project, where an anchor is created 
+// when the user pinches the controller
 function buildAnchorMarker(anchor, isRecovered) {
-	const geometry = new three__WEBPACK_IMPORTED_MODULE_3__.BoxGeometry(0.05, 0.05, 0.05);
-	const material = new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial({
+	const geometry = new three__WEBPACK_IMPORTED_MODULE_4__.BoxGeometry(0.05, 0.05, 0.05);
+	const material = new three__WEBPACK_IMPORTED_MODULE_4__.MeshBasicMaterial({
 		color: isRecovered ? 0xff0000 : 0x00ff00,
 	});
-	const cube = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(geometry, material);
+	const cube = new three__WEBPACK_IMPORTED_MODULE_4__.Mesh(geometry, material);
 	anchor.add(cube);
 	console.log(
 		`anchor created (id: ${anchor.anchorID}, isPersistent: ${anchor.isPersistent}, isRecovered: ${isRecovered})`,
@@ -69830,6 +70751,54 @@ function updateSemanticLabels() {
 	});
 }
 
+function animateIn(obj) {
+	return new Promise((resolve) => {
+		var originalPosition = obj.position.y;
+		var originalScale = { x: 1, y: 1, z: 1 }
+		obj.scale.set(0, 0, 0);
+
+		obj.position.y = originalPosition - 1;
+		const positionTween = new _tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_1__.Tween(obj.position)
+			.to({ y: originalPosition }, 1000) // Move upward to y = 2 in 2000 milliseconds (2 seconds)
+			.easing(_tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_1__.Easing.Linear.None)
+			.start();
+
+		const rotationTween = new _tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_1__.Tween(obj.rotation)
+			.to({ y: Math.PI * 2 }, 1000) // Rotate 360 degrees in 3000 milliseconds (3 seconds)
+			.easing(_tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_1__.Easing.Linear.None)
+			.start();
+
+		const scaleTween = new _tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_1__.Tween(obj.scale)
+			.to(originalScale, 1000) // Scale up to (1, 1, 1) in 2000 milliseconds (2 seconds)
+			.easing(_tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_1__.Easing.Linear.None)
+			.start();
+
+		// when scale, rotation, and positiiion are done, resolve the promise
+		setTimeout(() => {
+			resolve()
+		}, 1000);
+	})
+}
+
+function animateOut(obj) {
+	return new Promise((resolve) => {
+		const positionTween = new _tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_1__.Tween(obj.position)
+			.to({ y: 0 }, 250)
+			.easing(_tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_1__.Easing.Bounce.None)
+			.start();
+
+		// Create a Tween for scaling
+		const scaleTween = new _tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_1__.Tween(obj.scale)
+			.to({ x: 0, y: 0, z: 0 }, 1000)
+			.easing(_tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_1__.Easing.Linear.None)
+			.start();
+
+		// when scale, rotation, and positiiion are done, resolve the promise
+		setTimeout(() => {
+			resolve()
+		}, 1000);
+	})
+}
 })();
 
 /******/ })()
