@@ -70806,6 +70806,8 @@ function listenRightHand(delta) {
 			}
 		}
 		handyRight?.traverse((child) => { if (child.material) child.material.color = new three__WEBPACK_IMPORTED_MODULE_5__.Color().lerpColors(defaultColor, successColor, userCorrectAnswerInterval / correctIntervalThreshold); });
+	} else {
+		console.warn("Handy Right is not setup")
 	}
 }
 
