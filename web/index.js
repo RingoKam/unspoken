@@ -596,6 +596,8 @@ function listenRightHand(delta) {
 			}
 		}
 		handyRight?.traverse((child) => { if (child.material) child.material.color = new Color().lerpColors(defaultColor, successColor, userCorrectAnswerInterval / correctIntervalThreshold); });
+	} else {
+		console.warn("Handy Right is not setup")
 	}
 }
 
