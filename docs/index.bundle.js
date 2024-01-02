@@ -70540,7 +70540,7 @@ function setupController() {
 
 function setupHandy() {
 	// once we make handy
-	// Handy.makeHandy(leftHand)
+	_handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__.Handy.makeHandy(leftHand)
 	_handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__.Handy.makeHandy(rightHand)
 
 	

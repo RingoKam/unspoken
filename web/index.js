@@ -330,7 +330,7 @@ function setupController() {
 
 function setupHandy() {
 	// once we make handy
-	// Handy.makeHandy(leftHand)
+	Handy.makeHandy(leftHand)
 	Handy.makeHandy(rightHand)
 
 	
