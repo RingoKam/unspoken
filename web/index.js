@@ -14,16 +14,19 @@ import {
 	Vector3,
 	WebGLRenderer,
 	Color,
-	Box3
+	Box3,
+	TextureLoader,
+	PlaneGeometry
 } from 'three';
 import * as TWEEN from "@tweenjs/tween.js";
 import { Handy } from './handy/src/Handy.js'
 import { Text } from 'troika-three-text';
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
 import { XRHandModelFactory } from 'three/examples/jsm/webxr/XRHandModelFactory.js';
-import { update, loadPose, getMatchedPoses } from './handyworks/build/esm/handy-work.standalone.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { setupSfx, playCorrect, playGameOver, stopChargingAudio, playChargingAudio } from './soundEffects.js';
+import { followPlayerHand, setupReferenceImage } from './assets/referenceImage.js';
 import GhostHand from './ghost-hand.js';
 
 // Game states
@@ -71,13 +74,14 @@ const handModels = {
 let listenPose = false
 
 // Initialize and animate the scene
-init();
-animate();
+init().then(() => {
+	animate();
+});
 
 /**
  * Initializes the scene, camera, renderer, lighting, and AR functionalities.
  */
-function init() {
+async function init() {
 	gameState = GAME_STATE.START;
 
 	scene = new Scene();
@@ -87,7 +91,9 @@ function init() {
 	setupARButton();
 	setupController();
 	setupHandy();
+	await setupSfx(camera);
 	window.addEventListener('resize', onWindowResize);
+	setupReferenceImage(scene);
 	setupRATK();
 
 	// Ghost hand
@@ -295,15 +301,9 @@ function setupController() {
 
 	scene.add(leftHand);
 
-	handModels.left = [
-		handModelFactory.createHandModel(leftHand, 'mesh'),
-		handModelFactory.createHandModel(leftHand, 'spheres'),
-		handModelFactory.createHandModel(leftHand, 'boxes')
-	];
-
-	handModels.left[0].visible = true;
-	handModels.left[1].frustumCulled = false;
-	leftHand.add(handModels.left[0]);
+	handModels.left = handModelFactory.createHandModel(leftHand, 'mesh')
+	handModels.left.visible = true;
+	leftHand.add(handModels.left);
 
 	// console.log(hand1);
 
@@ -355,15 +355,16 @@ function setupHandy() {
 	Handy.makeHandy(leftHand)
 	Handy.makeHandy(rightHand)
 
-	if (handyLeft == null) {
-		handyLeft = Handy.hands.getLeft()
-		// if (handyLeft) {
-		// 	console.log("found left!")
-		// 	handyLeft.addEventListener("pose changed", (event) => {
-		// 		// console.log(event.message)
-		// 	})
-		// }
-	}
+	
+	// if (handyLeft == null) {
+	// 	handyLeft = Handy.hands.getLeft()
+	// 	// if (handyLeft) {
+	// 	// 	console.log("found left!")
+	// 	// 	handyLeft.addEventListener("pose changed", (event) => {
+	// 	// 		// console.log(event.message)
+	// 	// 	})
+	// 	// }
+	// }
 	if (handyRight == null) {
 		handyRight = Handy.hands.getRight()
 		// if (handyRight) {
@@ -373,6 +374,10 @@ function setupHandy() {
 		// 	})
 		// }
 	}
+
+	// if (handyLeft == null) {
+	// 	handyLeft = Handy.hands.getLeft()
+	// }
 }
 
 /**
@@ -515,7 +520,6 @@ function render(arg) {
 	handlePendingAnchors();
 	ratk.update();
 	updateSemanticLabels();
-
 	const session = renderer.xr.getSession();
 
 	// TODO: there are some logic here that we use to setup the hands
@@ -594,24 +598,28 @@ function listenRightHand(delta) {
 		// Right Hand... 
 		if (rightHand.isPose(`asl ${correctAnswer?.toLowerCase()}`, 3000)) {
 			// Get the time away from last frame in threejs
+			playChargingAudio(0);
 			userCorrectAnswerInterval += delta;
 			if (userCorrectAnswerInterval > correctIntervalThreshold) {
-				// user has held the pose for 1.5 seconds
 				// transition to the next state
-				if (questionIndex == questions.length - 1) {
+				if (questionIndex >= questions.length - 1) {
+					playGameOver();
 					endGame();
 				} else {
+					playCorrect();
 					nextQuestion();
 				}
 			}
-			// if time reached 3 seconds, then user has held the pose for 3 seconds
 		} else {
+			stopChargingAudio();
 			if (userCorrectAnswerInterval > 0) {
 				const newInterval = userCorrectAnswerInterval - (delta * incorrectAnswerMultipler);
 				userCorrectAnswerInterval = newInterval > 0 ? newInterval : 0;
 			}
 		}
 		handyRight?.traverse((child) => { if (child.material) child.material.color = new Color().lerpColors(defaultColor, successColor, userCorrectAnswerInterval / correctIntervalThreshold); });
+	} else {
+		console.warn("Handy Right is not setup")
 	}
 }
 
