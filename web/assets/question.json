@@ -23,5 +23,110 @@
         "word": "TREE",
         "answer": "E",
         "model": "/models/tree.glb"
-    }
+    },
+    {
+        "word": "Football",
+        "answer": "F",
+        "model": "/models/football.glb"
+    },
+    {
+        "word": "Guitar",
+        "answer": "G",
+        "model": "/models/guitar.glb"
+    },
+    {
+        "word": "House",
+        "answer": "H",
+        "model": "/models/house.glb"
+    },
+    {
+        "word": "Ice cream cone",
+        "answer": "I",
+        "model": "/models/ice_cream_cone.glb"
+    },
+    {
+        "word": "Jellyfish",
+        "answer": "J",
+        "model": "/models/jellyfish.glb"
+    },
+    {
+        "word": "Key",
+        "answer": "K",
+        "model": "/models/key.glb"
+    },
+    {
+        "word": "Lemon",
+        "answer": "L",
+        "model": "/models/lemon.glb"
+    },
+    {
+        "word": "Moon",
+        "answer": "M",
+        "model": "/models/moon.glb"
+    },
+    {
+        "word": "Necklace",
+        "answer": "N",
+        "model": "/models/necklace.glb"
+    },
+    {
+        "word": "Orange",
+        "answer": "O",
+        "model": "/models/orange.glb"
+    },
+    {
+        "word": "Piano",
+        "answer": "P",
+        "model": "/models/piano.glb"
+    },
+    {
+        "word": "Queen's crown",
+        "answer": "Q",
+        "model": "/models/queen_crown.glb"
+    },
+    {
+        "word": "Rocket",
+        "answer": "R",
+        "model": "/models/rocket.glb"
+    },
+    {
+        "word": "Sun",
+        "answer": "S",
+        "model": "/models/sun.glb"
+    },
+    {
+        "word": "Tree",
+        "answer": "T",
+        "model": "/models/tree.glb"
+    },
+    {
+        "word": "Umbrella",
+        "answer": "U",
+        "model": "/models/umbrella.glb"
+    },
+    {
+        "word": "Van",
+        "answer": "V",
+        "model": "/models/van.glb"
+    },
+    {
+        "word": "Whale",
+        "answer": "W",
+        "model": "/models/whale.glb"
+    },
+    {
+        "word": "Xylophone",
+        "answer": "X",
+        "model": "/models/xylophone.glb"
+    },
+    {
+        "word": "Yacht",
+        "answer": "Y",
+        "model": "/models/yacht.glb"
+    },
+    {
+        "word": "Zipper",
+        "answer": "Z",
+        "model": "/models/zipper.glb"
+    }    
 ]
