@@ -40,6 +40,7 @@ let gameState = GAME_STATE.START;
 
 // Global variables for scene components
 let camera, scene, renderer;
+let cameraWorldPosition = new Vector3();
 let controller1, controller2;
 let leftHand, rightHand;
 let controllerGrip1, controllerGrip2;
@@ -48,6 +49,9 @@ let pendingAnchorData = null;
 let handyLeft, handyRight;
 const groupList = []
 let anchorCreated = false
+let ghostHand = null;
+let ghostHandModel = null;
+
 
 const successColor = new Color(0x66941B)
 const defaultColor = new Color(0x000000)
@@ -97,24 +101,23 @@ async function init() {
 	setupRATK();
 
 	// Ghost hand
-	var ghostHand = new GhostHand()
-	ghostHand.loadBoxHandModel('left').then((handModel) => {
+	ghostHand = new GhostHand(scene)
+	ghostHand.loadBoxHandModel('right').then((handModel) => {
 		handModel.scale.set(1,1,1);
-		handModel.position.set(0, 0.75, -1);	
+		handModel.position.set(0, 0.75, -1);
+		// We need rotate the hand based on the character
 		handModel.rotateX(Math.PI / 2);
-		handModel.rotateZ(Math.PI / 1);
+		// handModel.rotateZ(Math.PI / -2); // thumb face toward us
+		handModel.rotateZ(Math.PI / -1); // palm toward us
+		ghostHandModel = handModel;
 		scene.add(handModel);
-
-
-		var box = new BoxGeometry(0.05, 0.05, 0.05);
-		var material = new MeshBasicMaterial();
-		var cube = new Mesh(box, material);
-		cube.position.set(0, 0.75, -1);
-		scene.add(cube)
-
+		// var box = new BoxGeometry(0.05, 0.05, 0.05);
+		// var material = new MeshBasicMaterial();
+		// var cube = new Mesh(box, material);
+		// cube.position.set(0, 0.75, -1);
+		// scene.add(cube)
 		// Rotate the handModel by 90 degrees
 		// handModel.rotateX(Math.PI / 2);
-		ghostHand.updateBoxHandPose('asl a');
 	});
 }
 
@@ -184,6 +187,14 @@ async function setupQuestion(data) {
 	// We should load all the question at once to speed things up?
 	loader.load(`./${data.model}`, function (gltf) {
 		const question = data.word.replace(data.answer, "_")
+		ghostHand.updateBoxHandPose(`asl ${data.answer.toLowerCase()}`)
+
+		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
+		console.log(cameraWorldPosition)
+		ghostHandModel.position.set(cameraWorldPosition.x + 0.1, cameraWorldPosition.y - 0.1, cameraWorldPosition.z - 0.3)
+		// based on the position of the user camera, set it infront of it
+
+
 		correctAnswer = data.answer
 		anchorText.text = question
 		anchorText.sync();

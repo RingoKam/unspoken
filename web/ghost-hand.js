@@ -1,9 +1,30 @@
-import { Group, MeshBasicMaterial, InstancedMesh, SphereGeometry, MeshStandardMaterial, DynamicDrawUsage, Object3D } from 'three';
+import { 
+    Group, 
+    MeshBasicMaterial, 
+    InstancedMesh, 
+    SphereGeometry, 
+    MeshStandardMaterial, 
+    DynamicDrawUsage, 
+    Object3D,
+    LineBasicMaterial,
+    Vector3,
+    BufferGeometry,
+    Line,
+    Matrix4
+} from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { poses as leftPoses } from "./handy/src/Handy-poses-left.js"
 import { poses as rightPoses } from "./handy/src/Handy-poses-right.js"
 
 const DEFAULT_HAND_PROFILE_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles/generic-hand/';
+
+// joint connection map 
+const wristLine = { origin: 0, line: [1, 5, 10, 15, 20] };
+const thumbLine = { origin: 1, line: [2, 3, 4] };
+const indexLine = { origin: 5, line: [6, 7, 8, 9] };
+const middleLine = { origin: 10, line: [11, 12, 13, 14] };
+const ringLine = { origin: 15, line: [16, 17, 18, 19] };
+const pinkyLine = { origin: 20, line: [21, 22, 23, 24] };
 
 // Joints are ordered from wrist outwards
 const joints = [
@@ -37,13 +58,15 @@ const joints = [
 
 
 export default class GhostHand {
-    constructor() {
+    constructor(scene) {
+        this.scene = scene;
         this.bones = [];
         this.boneBox = {};
         this.loader = new GLTFLoader();
         this.handedness = null;
         this.loader.setPath(DEFAULT_HAND_PROFILE_PATH);
-
+        this.handModel = new Group();
+        this.fingerLinesObj = null;
         // instancedMesh for boxes
         this.boxInstancedMesh = null;
     }
@@ -67,10 +90,9 @@ export default class GhostHand {
             handMesh.receiveShadow = true;
             this.boxInstancedMesh = handMesh
 
-            const handModel = new Group();
-            handModel.add(handMesh);
-        
-            resolve(handModel);
+            this.handModel.add(handMesh);
+
+            resolve(this.handModel);
         })
     }
 
@@ -79,20 +101,94 @@ export default class GhostHand {
         const poses = this.handedness === 'left' ? leftPoses : rightPoses;
         const selectedPose = poses.find(pose => pose.names.find(name => name == poseName));
         const jointPositions = selectedPose.jointPositions;
-        
+
         const dummy = new Object3D()
 
         for (let i = 0; i < joints.length; i++) {
             const jointPos = jointPositions[i];
             if (jointPos !== undefined) {
                 const [x, y, z] = jointPos;
-                dummy.position.set(x,y,z);
+                dummy.position.set(x, y, z);
                 dummy.position.multiplyScalar(0.001);
                 dummy.updateMatrix();
                 console.log(dummy.position)
                 this.boxInstancedMesh.setMatrixAt(i, dummy.matrix);
             }
         }
+        // draw line between points
+        this.updatePointInBetween();
+    }
+
+    updatePointInBetween() {
+        // Draw wrist line
+        // SetPixelRatio
+        const material = new LineBasicMaterial({ 
+            color: "white", 
+            visible: true,
+            linewidth: 2
+        });
+        const originPosition = new Vector3(0, 0, 0);
+        const dummy = new Vector3()
+        let matrix = new Matrix4();
+
+        const { line, origin } = wristLine
+        this.boxInstancedMesh.getMatrixAt(origin, matrix);
+        dummy.setFromMatrixPosition(matrix);
+		originPosition.copy(dummy)
+
+        // create the 5 lines for the fingers
+        if(this.fingerLinesObj == null) {
+            this.fingerLinesObj = Array.from({length: 10}).map(() => {
+                const geometry = new BufferGeometry();
+                const line = new Line(geometry, material);
+                line.frustumCulled = false;
+                line.castShadow = false;
+                line.receiveShadow = false;
+                this.handModel.add(line);
+                return line;
+            });
+        }
+        // draw a line that connect the origin with each line
+        for (let i = 0; i < line.length; i++) {
+            // get the hand instance
+            // dummy.position.set(0, 0, 0);
+            const linePosition = new Vector3(0, 0, 0);
+            this.boxInstancedMesh.getMatrixAt(line[i], matrix);
+            dummy.setFromMatrixPosition(matrix);
+            linePosition.copy(dummy)
+            console.log(originPosition, linePosition)
+            this.fingerLinesObj[i].geometry.setFromPoints([originPosition, linePosition])
+            // const geometry = new BufferGeometry().setFromPoints([originPosition, linePosition]);
+            // const wristLine = new Line(geometry, material);
+            // wristLinel.BufferGeometry.setFromPoints([originPosition, linePosition])
+            // wristLine.frustumCulled = false;
+            // wristLine.castShadow = false;
+            // wristLine.receiveShadow = false;
+            // this.handModel.add(wristLine);
+        }
+
+        // draw rest of the lines
+        const fingerLines = [thumbLine, indexLine, middleLine, ringLine, pinkyLine];
+        fingerLines.forEach((finger, i) => {
+            const { line, origin } = finger
+            this.boxInstancedMesh.getMatrixAt(origin, matrix);
+            dummy.setFromMatrixPosition(matrix);
+            originPosition.copy(dummy)
+
+            const posLines = [originPosition];
+            // draw a line that connect the origin with each line
+            for (let i = 0; i < line.length; i++) {
+                // get the hand instance
+                // dummy.position.set(0, 0, 0);
+                const linePosition = new Vector3(0, 0, 0);
+                this.boxInstancedMesh.getMatrixAt(line[i], matrix);
+                dummy.setFromMatrixPosition(matrix);
+                linePosition.copy(dummy)
+                posLines.push(linePosition)
+            }
+            this.fingerLinesObj[5 + i].geometry.setFromPoints(posLines)
+            // this.handModel.add(anotherFingerLine);
+        })        
     }
 
     // this works, however we current don't track rotational data in threejs
@@ -132,7 +228,6 @@ export default class GhostHand {
             }, undefined, reject)
         })
     }
-
 
     updateHandPose(poseName) {
         if (this.bones.length === 0) return;
