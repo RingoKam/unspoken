@@ -24,6 +24,7 @@ import { XRHandModelFactory } from 'three/examples/jsm/webxr/XRHandModelFactory.
 import { update, loadPose, getMatchedPoses } from './handyworks/build/esm/handy-work.standalone.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import GhostHand from './ghost-hand.js';
 
 // Game states
 const GAME_STATE = {
@@ -88,6 +89,27 @@ function init() {
 	setupHandy();
 	window.addEventListener('resize', onWindowResize);
 	setupRATK();
+
+	// Ghost hand
+	var ghostHand = new GhostHand()
+	ghostHand.loadBoxHandModel('left').then((handModel) => {
+		handModel.scale.set(1,1,1);
+		handModel.position.set(0, 0.75, -1);	
+		handModel.rotateX(Math.PI / 2);
+		handModel.rotateZ(Math.PI / 1);
+		scene.add(handModel);
+
+
+		var box = new BoxGeometry(0.05, 0.05, 0.05);
+		var material = new MeshBasicMaterial();
+		var cube = new Mesh(box, material);
+		cube.position.set(0, 0.75, -1);
+		scene.add(cube)
+
+		// Rotate the handModel by 90 degrees
+		// handModel.rotateX(Math.PI / 2);
+		ghostHand.updateBoxHandPose('asl a');
+	});
 }
 
 let questionIndex = 0;
