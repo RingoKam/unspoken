@@ -23,5 +23,129 @@
         "word": "TREE",
         "answer": "E",
         "model": "/models/tree.glb"
-    }
+    },
+    {
+        "word": "FOOTBALL",
+        "answer": "F",
+        "model": "/models/football.glb"
+    },
+    {
+        "word": "GUITAR",
+        "answer": "G",
+        "model": "/models/guitar.glb"
+    },
+    {
+        "word": "HOUSE",
+        "answer": "H",
+        "model": "/models/house.glb",
+        "credit": "https://sketchfab.com/3d-models/low-poly-simple-house-6a62234713884ef99d95803d7590d183"
+    },
+    {
+        "word": "IGLOO",
+        "answer": "I",
+        "model": "/models/igloo.glb",
+        "credit": "https://sketchfab.com/3d-models/igloo-e581c2f769f64515b54ab1d5bc348bd4"
+    },
+    {
+        "word": "JELLYFISH",
+        "answer": "J",
+        "model": "/models/jellyfish.glb",
+        "credit": "https://sketchfab.com/3d-models/jellyfish-8aa47e5107bc422ba523231e569c5499"
+    },
+    {
+        "word": "KEY",
+        "answer": "K",
+        "model": "/models/key.glb",
+        "credit": "https://sketchfab.com/3d-models/key-1ae54d3a720e4ca899da5ab9508908e1#download"
+    },
+    {
+        "word": "LEMON",
+        "answer": "L",
+        "model": "/models/lemon.glb",
+        "credit": "https://sketchfab.com/3d-models/lemon-low-poly-8934f1e73b1e4f679c74f4eb1d4cd53a#download"
+    },
+    {
+        "word": "MOON",
+        "answer": "M",
+        "model": "/models/moon.glb",
+        "credit": "https://sketchfab.com/3d-models/ps1-style-low-poly-moon-a0800eda5580488092cbb48c415180a9"
+    },
+    {
+        "word": "NEWS",
+        "answer": "N",
+        "model": "/models/news.glb",
+        "credit": "https://sketchfab.com/3d-models/newspaper-9a4c3101901a46abb28d632ddce8a5c4#download"
+    },
+    {
+        "word": "ORANGE",
+        "answer": "O",
+        "model": "/models/orange.glb",
+        "credit": "https://sketchfab.com/3d-models/orange-a9d71a86a8344606be0e512669b4acc5#download"
+    },
+    {
+        "word": "PIANO",
+        "answer": "P",
+        "model": "/models/piano.glb",
+        "credit": "https://sketchfab.com/3d-models/piano-low-poly-ae34e376884b4337a24b38fe1d3ecec7#download"
+    },
+    {
+        "word": "QUEST",
+        "answer": "Q",
+        "model": "/models/quest.glb",
+        "credit": "https://sketchfab.com/3d-models/oculus-quest-2-3bdefae06ff04297a3e694faa5121156#download"
+    },
+    {
+        "word": "ROCKET",
+        "answer": "R",
+        "model": "/models/rocket.glb",
+        "credit": "https://sketchfab.com/3d-models/rocket-ship-low-poly-96858de4225f42048c88be630697f9cb#download"
+    },
+    {
+        "word": "SUN",
+        "answer": "S",
+        "model": "/models/sun.glb",
+        "credit": "https://sketchfab.com/3d-models/low-poly-sun-8c1d2c3ed23e4e4984735bfa5bdfa008"
+    },
+    {
+        "word": "TACO",
+        "answer": "T",
+        "model": "/models/taco.glb",
+        "credit": "https://sketchfab.com/3d-models/taco-dda5d6db7f3141d397f15985e22bbd71"
+    },
+    {
+        "word": "UMBRELLA",
+        "answer": "U",
+        "model": "/models/umbrella.glb",
+        "credit": "https://sketchfab.com/3d-models/low-poly-umbrella-8a3fb1f7fe9a483aa96b6f7b0969b7a4"
+    },
+    {
+        "word": "VAN",
+        "answer": "V",
+        "model": "/models/van.glb",
+        "credit": "https://sketchfab.com/3d-models/low-poly-van-baea8874ff0844429b67abe0ab54d0ac"
+    },
+    {
+        "word": "WHALE",
+        "answer": "W",
+        "model": "/models/whale.glb",
+        "credit": "https://sketchfab.com/3d-models/low-poly-whale-325215f66cd34dccb59afeab1d9be10f"
+    },
+    {
+        "word": "XYLOPHONE",
+        "answer": "X",
+        "model": "/models/xylophone.glb",
+        "credit": "https://sketchfab.com/3d-models/kid-s-toy-xylophone-b4ce27325fc9432ba62d9339447da09a"
+    },
+    {
+        "word": "YETI",
+        "answer": "Y",
+        "model": "/models/yeti.glb",
+        "credit": "https://sketchfab.com/3d-models/lowpoly-bigfoot-a85b050494a14d8aa7a5a94c82a6176c"
+    },
+    {
+        "word": "ZERO",
+        "answer": "Z",
+        "model": "/models/zipper.glb",
+        "credit": "https://sketchfab.com/3d-models/number-0-zero-48e372695c0649debdb933edc1d27504"
+    }    
 ]

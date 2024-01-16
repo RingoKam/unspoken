@@ -15,3 +15,21 @@
         3. Once threshold is met, consider answer is received
     5. Answer received, go to the next question, back to step 2
 3. Display user result
+
+## TODO
+Refactoring
+* 
+
+Game Design:
+* 
+
+Game Feel:
+* Add animation/transition when new question pop up
+* When user get the correct answer
+  * add some kind of audio feedback
+  * scale up (bounce?) text and change color 
+
+Question 
+* Init - load up the quesiton
+* Next - 
+* 
