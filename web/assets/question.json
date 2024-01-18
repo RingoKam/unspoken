@@ -139,13 +139,13 @@
     {
         "word": "YETI",
         "answer": "Y",
-        "model": "/models/yeti.glb",
-        "credit": "https://sketchfab.com/3d-models/lowpoly-bigfoot-a85b050494a14d8aa7a5a94c82a6176c"
+        "model": "/models/yacht.glb",
+        "credit": "https://poly.pizza/m/9znU2c-dTSR"
     },
     {
         "word": "ZERO",
         "answer": "Z",
-        "model": "/models/zipper.glb",
+        "model": "/models/zero.glb",
         "credit": "https://sketchfab.com/3d-models/number-0-zero-48e372695c0649debdb933edc1d27504"
     }    
 ]
