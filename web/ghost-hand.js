@@ -26,6 +26,7 @@ const middleLine = { origin: 10, line: [11, 12, 13, 14] };
 const ringLine = { origin: 15, line: [16, 17, 18, 19] };
 const pinkyLine = { origin: 20, line: [21, 22, 23, 24] };
 
+var originalScale = { x: 1, y: 1, z: 1 }
 // Joints are ordered from wrist outwards
 const joints = [
     'wrist',
@@ -69,6 +70,9 @@ export default class GhostHand {
         this.fingerLinesObj = null;
         // instancedMesh for boxes
         this.boxInstancedMesh = null;
+
+        this.lineMaterial = null;
+        this.jointMaterial = null;
     }
 
 
@@ -77,13 +81,14 @@ export default class GhostHand {
 
         return new Promise((resolve, reject) => {
             const geometry = new SphereGeometry(0.005, 10, 10);
-            const material = new MeshBasicMaterial({
+            this.jointMaterial = new MeshBasicMaterial({
                 color: '#95c6eb',
                 transparent: true,
-                opacity: 0.7
+                opacity: 0.7,
+                visible: false
             });
 
-            const handMesh = new InstancedMesh(geometry, material, joints.length);
+            const handMesh = new InstancedMesh(geometry, this.jointMaterial, joints.length);
             handMesh.frustumCulled = false;
             handMesh.instanceMatrix.setUsage(DynamicDrawUsage); // will be updated every frame
             handMesh.castShadow = true;
@@ -97,6 +102,7 @@ export default class GhostHand {
     }
 
     updateBoxHandPose(poseName) {
+        console.log("updateBoxHandPose" + poseName)
         if (this.boxInstancedMesh == null) return;
         const poses = this.handedness === 'left' ? leftPoses : rightPoses;
         const selectedPose = poses.find(pose => pose.names.find(name => name == poseName));
@@ -113,6 +119,7 @@ export default class GhostHand {
                 dummy.updateMatrix();
                 console.log(dummy.position)
                 this.boxInstancedMesh.setMatrixAt(i, dummy.matrix);
+                this.boxInstancedMesh.updateMatrix();
             }
         }
         // draw line between points
@@ -122,7 +129,7 @@ export default class GhostHand {
     updatePointInBetween() {
         // Draw wrist line
         // SetPixelRatio
-        const material = new LineBasicMaterial({ 
+        this.lineMaterial = new LineBasicMaterial({ 
             color: "white", 
             visible: true,
             linewidth: 2
@@ -140,7 +147,7 @@ export default class GhostHand {
         if(this.fingerLinesObj == null) {
             this.fingerLinesObj = Array.from({length: 10}).map(() => {
                 const geometry = new BufferGeometry();
-                const line = new Line(geometry, material);
+                const line = new Line(geometry, this.lineMaterial);
                 line.frustumCulled = false;
                 line.castShadow = false;
                 line.receiveShadow = false;
@@ -150,21 +157,12 @@ export default class GhostHand {
         }
         // draw a line that connect the origin with each line
         for (let i = 0; i < line.length; i++) {
-            // get the hand instance
-            // dummy.position.set(0, 0, 0);
             const linePosition = new Vector3(0, 0, 0);
             this.boxInstancedMesh.getMatrixAt(line[i], matrix);
             dummy.setFromMatrixPosition(matrix);
             linePosition.copy(dummy)
             console.log(originPosition, linePosition)
             this.fingerLinesObj[i].geometry.setFromPoints([originPosition, linePosition])
-            // const geometry = new BufferGeometry().setFromPoints([originPosition, linePosition]);
-            // const wristLine = new Line(geometry, material);
-            // wristLinel.BufferGeometry.setFromPoints([originPosition, linePosition])
-            // wristLine.frustumCulled = false;
-            // wristLine.castShadow = false;
-            // wristLine.receiveShadow = false;
-            // this.handModel.add(wristLine);
         }
 
         // draw rest of the lines
@@ -189,6 +187,14 @@ export default class GhostHand {
             this.fingerLinesObj[5 + i].geometry.setFromPoints(posLines)
             // this.handModel.add(anotherFingerLine);
         })        
+    }
+
+    showBoxHandModel() {
+        this.handModel.visible = true;
+    }
+
+    hideBoxhandModel() {
+        this.handModel.visible = false;
     }
 
     // this works, however we current don't track rotational data in threejs

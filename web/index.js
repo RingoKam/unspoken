@@ -51,6 +51,7 @@ const groupList = []
 let anchorCreated = false
 let ghostHand = null;
 let ghostHandModel = null;
+let timeoutBoxHandId = null; // timeout for box hand
 
 
 const successColor = new Color(0x66941B)
@@ -80,6 +81,19 @@ let listenPose = false
 // Initialize and animate the scene
 init().then(() => {
 	animate();
+
+	// just for testing purpose, lets listen for space key
+	window.addEventListener('keydown', (event) => {
+		if (event.code == "Space" && window._debug) {
+			if (questionIndex >= questions.length - 1) {
+				playGameOver();
+				endGame();
+			} else {
+				playCorrect();
+				nextQuestion();
+			}
+		}
+	});
 });
 
 /**
@@ -187,7 +201,14 @@ async function setupQuestion(data) {
 	// We should load all the question at once to speed things up?
 	loader.load(`./${data.model}`, function (gltf) {
 		const question = data.word.replace(data.answer, "_")
-		ghostHand.updateBoxHandPose(`asl ${data.answer.toLowerCase()}`)
+
+		ghostHand.hideBoxhandModel();
+		ghostHand.updateBoxHandPose(`asl ${data.answer.toLowerCase()}`);
+		clearTimeoutBoxHand();
+		// show ghost hand after 5 seconds
+		timeoutBoxHandId = setTimeout(() => {
+			ghostHand.showBoxHandModel();
+		}, 5000);
 
 		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
 		console.log(cameraWorldPosition)
@@ -612,6 +633,7 @@ function listenRightHand(delta) {
 			playChargingAudio(0);
 			userCorrectAnswerInterval += delta;
 			if (userCorrectAnswerInterval > correctIntervalThreshold) {
+				clearTimeoutBoxHand();
 				// transition to the next state
 				if (questionIndex >= questions.length - 1) {
 					playGameOver();
@@ -634,6 +656,13 @@ function listenRightHand(delta) {
 	}
 }
 
+function clearTimeoutBoxHand() {
+	if(timeoutBoxHandId !== null) {
+		clearTimeout(timeoutBoxHandId);
+		timeoutBoxHandId = null;
+	}
+}
+
 function endGame() {
 	gameState = GAME_STATE.END;
 
@@ -647,6 +676,7 @@ function endGame() {
 function nextQuestion() {
 	listenPose = false;
 	gameState = GAME_STATE.LOADING;
+	ghostHand.hideBoxhandModel();
 	userCorrectAnswerInterval = correctIntervalThreshold;
 	anchorText.text = anchorText.text.replace("_", correctAnswer);
 	anchorText.sync();

@@ -76,10 +76,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ GhostHand)
 /* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! three/addons/loaders/GLTFLoader.js */ "./node_modules/three/examples/jsm/loaders/GLTFLoader.js");
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! three/addons/loaders/GLTFLoader.js */ "./node_modules/three/examples/jsm/loaders/GLTFLoader.js");
 /* harmony import */ var _handy_src_Handy_poses_left_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./handy/src/Handy-poses-left.js */ "./handy/src/Handy-poses-left.js");
 /* harmony import */ var _handy_src_Handy_poses_right_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./handy/src/Handy-poses-right.js */ "./handy/src/Handy-poses-right.js");
+/* harmony import */ var _tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tweenjs/tween.js */ "./node_modules/@tweenjs/tween.js/dist/tween.esm.js");
+
 
 
 
@@ -95,6 +97,7 @@ const middleLine = { origin: 10, line: [11, 12, 13, 14] };
 const ringLine = { origin: 15, line: [16, 17, 18, 19] };
 const pinkyLine = { origin: 20, line: [21, 22, 23, 24] };
 
+var originalScale = { x: 1, y: 1, z: 1 }
 // Joints are ordered from wrist outwards
 const joints = [
     'wrist',
@@ -131,13 +134,16 @@ class GhostHand {
         this.scene = scene;
         this.bones = [];
         this.boneBox = {};
-        this.loader = new three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_2__.GLTFLoader();
+        this.loader = new three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_3__.GLTFLoader();
         this.handedness = null;
         this.loader.setPath(DEFAULT_HAND_PROFILE_PATH);
-        this.handModel = new three__WEBPACK_IMPORTED_MODULE_3__.Group();
+        this.handModel = new three__WEBPACK_IMPORTED_MODULE_4__.Group();
         this.fingerLinesObj = null;
         // instancedMesh for boxes
         this.boxInstancedMesh = null;
+
+        this.lineMaterial = null;
+        this.jointMaterial = null;
     }
 
 
@@ -145,16 +151,17 @@ class GhostHand {
         this.handedness = handedness;
 
         return new Promise((resolve, reject) => {
-            const geometry = new three__WEBPACK_IMPORTED_MODULE_3__.SphereGeometry(0.005, 10, 10);
-            const material = new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial({
+            const geometry = new three__WEBPACK_IMPORTED_MODULE_4__.SphereGeometry(0.005, 10, 10);
+            this.jointMaterial = new three__WEBPACK_IMPORTED_MODULE_4__.MeshBasicMaterial({
                 color: '#95c6eb',
                 transparent: true,
-                opacity: 0.7
+                opacity: 0.7,
+                visible: false
             });
 
-            const handMesh = new three__WEBPACK_IMPORTED_MODULE_3__.InstancedMesh(geometry, material, joints.length);
+            const handMesh = new three__WEBPACK_IMPORTED_MODULE_4__.InstancedMesh(geometry, this.jointMaterial, joints.length);
             handMesh.frustumCulled = false;
-            handMesh.instanceMatrix.setUsage(three__WEBPACK_IMPORTED_MODULE_3__.DynamicDrawUsage); // will be updated every frame
+            handMesh.instanceMatrix.setUsage(three__WEBPACK_IMPORTED_MODULE_4__.DynamicDrawUsage); // will be updated every frame
             handMesh.castShadow = true;
             handMesh.receiveShadow = true;
             this.boxInstancedMesh = handMesh
@@ -166,12 +173,13 @@ class GhostHand {
     }
 
     updateBoxHandPose(poseName) {
+        console.log("updateBoxHandPose" + poseName)
         if (this.boxInstancedMesh == null) return;
         const poses = this.handedness === 'left' ? _handy_src_Handy_poses_left_js__WEBPACK_IMPORTED_MODULE_0__.poses : _handy_src_Handy_poses_right_js__WEBPACK_IMPORTED_MODULE_1__.poses;
         const selectedPose = poses.find(pose => pose.names.find(name => name == poseName));
         const jointPositions = selectedPose.jointPositions;
 
-        const dummy = new three__WEBPACK_IMPORTED_MODULE_3__.Object3D()
+        const dummy = new three__WEBPACK_IMPORTED_MODULE_4__.Object3D()
 
         for (let i = 0; i < joints.length; i++) {
             const jointPos = jointPositions[i];
@@ -182,6 +190,7 @@ class GhostHand {
                 dummy.updateMatrix();
                 console.log(dummy.position)
                 this.boxInstancedMesh.setMatrixAt(i, dummy.matrix);
+                this.boxInstancedMesh.updateMatrix();
             }
         }
         // draw line between points
@@ -191,14 +200,14 @@ class GhostHand {
     updatePointInBetween() {
         // Draw wrist line
         // SetPixelRatio
-        const material = new three__WEBPACK_IMPORTED_MODULE_3__.LineBasicMaterial({ 
+        this.lineMaterial = new three__WEBPACK_IMPORTED_MODULE_4__.LineBasicMaterial({ 
             color: "white", 
             visible: true,
             linewidth: 2
         });
-        const originPosition = new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 0);
-        const dummy = new three__WEBPACK_IMPORTED_MODULE_3__.Vector3()
-        let matrix = new three__WEBPACK_IMPORTED_MODULE_3__.Matrix4();
+        const originPosition = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0);
+        const dummy = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3()
+        let matrix = new three__WEBPACK_IMPORTED_MODULE_4__.Matrix4();
 
         const { line, origin } = wristLine
         this.boxInstancedMesh.getMatrixAt(origin, matrix);
@@ -208,8 +217,8 @@ class GhostHand {
         // create the 5 lines for the fingers
         if(this.fingerLinesObj == null) {
             this.fingerLinesObj = Array.from({length: 10}).map(() => {
-                const geometry = new three__WEBPACK_IMPORTED_MODULE_3__.BufferGeometry();
-                const line = new three__WEBPACK_IMPORTED_MODULE_3__.Line(geometry, material);
+                const geometry = new three__WEBPACK_IMPORTED_MODULE_4__.BufferGeometry();
+                const line = new three__WEBPACK_IMPORTED_MODULE_4__.Line(geometry, this.lineMaterial);
                 line.frustumCulled = false;
                 line.castShadow = false;
                 line.receiveShadow = false;
@@ -219,21 +228,12 @@ class GhostHand {
         }
         // draw a line that connect the origin with each line
         for (let i = 0; i < line.length; i++) {
-            // get the hand instance
-            // dummy.position.set(0, 0, 0);
-            const linePosition = new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 0);
+            const linePosition = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0);
             this.boxInstancedMesh.getMatrixAt(line[i], matrix);
             dummy.setFromMatrixPosition(matrix);
             linePosition.copy(dummy)
             console.log(originPosition, linePosition)
             this.fingerLinesObj[i].geometry.setFromPoints([originPosition, linePosition])
-            // const geometry = new BufferGeometry().setFromPoints([originPosition, linePosition]);
-            // const wristLine = new Line(geometry, material);
-            // wristLinel.BufferGeometry.setFromPoints([originPosition, linePosition])
-            // wristLine.frustumCulled = false;
-            // wristLine.castShadow = false;
-            // wristLine.receiveShadow = false;
-            // this.handModel.add(wristLine);
         }
 
         // draw rest of the lines
@@ -249,7 +249,7 @@ class GhostHand {
             for (let i = 0; i < line.length; i++) {
                 // get the hand instance
                 // dummy.position.set(0, 0, 0);
-                const linePosition = new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 0);
+                const linePosition = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0);
                 this.boxInstancedMesh.getMatrixAt(line[i], matrix);
                 dummy.setFromMatrixPosition(matrix);
                 linePosition.copy(dummy)
@@ -260,6 +260,14 @@ class GhostHand {
         })        
     }
 
+    showBoxHandModel() {
+        this.handModel.visible = true;
+    }
+
+    hideBoxhandModel() {
+        this.handModel.visible = false;
+    }
+
     // this works, however we current don't track rotational data in threejs
     // will need to investigate how to add the rotational data
     // @handness: 'left' or 'right'
@@ -268,10 +276,10 @@ class GhostHand {
         return new Promise((resolve, reject) => {
             this.loader.load(`${handedness}.glb`, gltf => {
                 const object = gltf.scene.children[0];
-                const handModel = new three__WEBPACK_IMPORTED_MODULE_3__.Group();
+                const handModel = new three__WEBPACK_IMPORTED_MODULE_4__.Group();
                 handModel.add(object);
 
-                const material = new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial({
+                const material = new three__WEBPACK_IMPORTED_MODULE_4__.MeshBasicMaterial({
                     color: '#95c6eb',
                     transparent: true,
                     opacity: 0.4
@@ -70520,6 +70528,7 @@ const groupList = []
 let anchorCreated = false
 let ghostHand = null;
 let ghostHandModel = null;
+let timeoutBoxHandId = null; // timeout for box hand
 
 
 const successColor = new three__WEBPACK_IMPORTED_MODULE_6__.Color(0x66941B)
@@ -70549,6 +70558,19 @@ let listenPose = false
 // Initialize and animate the scene
 init().then(() => {
 	animate();
+
+	// just for testing purpose, lets listen for space key
+	window.addEventListener('keydown', (event) => {
+		if (event.code == "Space" && window._debug) {
+			if (questionIndex >= questions.length - 1) {
+				(0,_soundEffects_js__WEBPACK_IMPORTED_MODULE_3__.playGameOver)();
+				endGame();
+			} else {
+				(0,_soundEffects_js__WEBPACK_IMPORTED_MODULE_3__.playCorrect)();
+				nextQuestion();
+			}
+		}
+	});
 });
 
 /**
@@ -70656,7 +70678,14 @@ async function setupQuestion(data) {
 	// We should load all the question at once to speed things up?
 	loader.load(`./${data.model}`, function (gltf) {
 		const question = data.word.replace(data.answer, "_")
-		ghostHand.updateBoxHandPose(`asl ${data.answer.toLowerCase()}`)
+
+		ghostHand.hideBoxhandModel();
+		ghostHand.updateBoxHandPose(`asl ${data.answer.toLowerCase()}`);
+		clearTimeoutBoxHand();
+		// show ghost hand after 5 seconds
+		timeoutBoxHandId = setTimeout(() => {
+			ghostHand.showBoxHandModel();
+		}, 5000);
 
 		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
 		console.log(cameraWorldPosition)
@@ -71081,6 +71110,7 @@ function listenRightHand(delta) {
 			(0,_soundEffects_js__WEBPACK_IMPORTED_MODULE_3__.playChargingAudio)(0);
 			userCorrectAnswerInterval += delta;
 			if (userCorrectAnswerInterval > correctIntervalThreshold) {
+				clearTimeoutBoxHand();
 				// transition to the next state
 				if (questionIndex >= questions.length - 1) {
 					(0,_soundEffects_js__WEBPACK_IMPORTED_MODULE_3__.playGameOver)();
@@ -71103,6 +71133,13 @@ function listenRightHand(delta) {
 	}
 }
 
+function clearTimeoutBoxHand() {
+	if(timeoutBoxHandId !== null) {
+		clearTimeout(timeoutBoxHandId);
+		timeoutBoxHandId = null;
+	}
+}
+
 function endGame() {
 	gameState = GAME_STATE.END;
 
@@ -71116,6 +71153,7 @@ function endGame() {
 function nextQuestion() {
 	listenPose = false;
 	gameState = GAME_STATE.LOADING;
+	ghostHand.hideBoxhandModel();
 	userCorrectAnswerInterval = correctIntervalThreshold;
 	anchorText.text = anchorText.text.replace("_", correctAnswer);
 	anchorText.sync();
