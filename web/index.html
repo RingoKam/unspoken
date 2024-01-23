@@ -1,91 +1,118 @@
-<!-- 
-  Copyright (c) Meta Platforms, Inc. and affiliates.
-
-  This source code is licensed under the MIT license found in the
-  LICENSE file in the root directory of this source tree.
--->
-
-<!doctype html>
+<!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1, shrink-to-fit=no"
-		/>
-		<title>Unspoken</title>
-		<style>
-			body {
-				font-family: Arial, sans-serif;
-				margin: 0;
-				line-height: 1.2;
-			}
-			strong {
-				font-weight: bold;
-			}
-			body {
-                font-family: 'Roboto', sans-serif;
-                margin: 0px;
-                line-height: 1.2;
-                background-color: #f9f9f9;
-            }
-            .container {
-                position: fixed; 
-                top: 10px; 
-                left: 10px;
-				background-color: black;
-				color: white;
-				padding: 20px;
-				border-radius: 10px;
-				height: calc(100vh - 60px);
-				width: calc(100vw - 60px);
-            }
-            button {
-                background-color: #4CAF50; /* Green */
-                border: none;
-                color: white;
-                padding: 15px 32px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                font-size: 16px;
-                margin: 4px 2px;
-                cursor: pointer;
-            }
-            button:hover {
-                background-color: #45a049;
-            }
-			.sign-img {
-				min-height: 250px;
-				height: 45vh;
-				max-height: 500px;
-			}
-		</style>
-	</head>
-	<body style="margin: 0">
-		<div id="scene-container" style="display: block"></div>
-		<div class="container">
-			<header>
-				<h1>Unspoken</h1>
-				<p>Learn the sign language alphabet from A to Z</p>
-			</header>
+<head>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <style>
+    .center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        text-align: center;
+    }
+    .logo {
+      width: 250px;
+      height: 250px;
+    }
+    .details-container {
+      display: flex;
+      align-items: flex-start; /* Align items to the left */
+      margin-top: 20px; /* Add space between image and text */
+      position: relative; /* Add position relative for container */
+    }
+    .image {
+      max-width: 300px;
+      max-height: 300px;
+    }
+    .details-text {
+      margin-left: 20px;
+      text-align: left; /* Align text to the left */
+    }
+    .details-button {
+    position: absolute; /* Position absolute to align with image */
+    right: 0;
+    bottom: 0;
+    transform: translate(50%, 50%); /* Adjust positioning relative to the image */
+    }
+    .details-text h1,
+    .details-text p {
+      align-items: flex-start; /* Align items to the left */
+      margin: 10px 0; /* Add space between header and paragraph text */
+    }
+    .dots-container {
+      display: flex;
+      justify-content: center;
+    }
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin: 0 4px;
+      background-color: lightgray;
+    }
+    .dot.active {
+      background-color: black;
+    }
+  </style>
+</head>
+<body>
+    <div class="center">
+      <div id="start-screen">
+        <img src="./img/unspoken.jpg" alt="Logo" class="logo">
+        <h1>Unspoken</h1>
+        <p>Learn American Sign Language (ASL) in Mixed Reality</p>
+        <button class="start-button" onclick="showDetails()">Start</button>
+      </div>
+      <div id="details-screen" style="display: none;">
+        <div class="details-container">
+          <img src="" alt="Image" class="image" id="details-image">
+          <div class="details-text">
+            <div class="dots-container">
+              <span class="dot active"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+            <h1 id="details-title"></h1>
+            <p id="details-description"></p>          
+            <button class="details-button" onclick="nextDetails()">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-			<p>
-				The American Sign Language (ASL) alphabet, also known as fingerspelling, is a system of representing the 26 letters of the English alphabet using specific handshapes. Each letter is assigned a unique handshape, and signers spell out words by forming these handshapes in the air.
-			</p>
+    <script>
+      var currentIndex = 0;
+      var images = ["./img/asl_signs.png", "./img/unspoken.jpg"];
+      var titles = ["American Sign Language", "Another Title"];
+      var descriptions = ["Cool description!", "Another Description"];
 
-			<p>
-				<img class="sign-img" src="./img/asl_signs.png">
-			</p>
+      function showDetails() {
+        document.getElementById("start-screen").style.display = "none";
+        document.getElementById("details-screen").style.display = "block";
+        updateDetails();
+      }
 
-			<p>
-				<strong>How to use:</strong> Tap your fingers together to start the lesson. Perform the appropriate sign for the missing character. 
-			</p>
+      function updateDetails() {
+        document.getElementById("details-image").src = images[currentIndex];
+        document.getElementById("details-title").innerHTML = titles[currentIndex];
+        document.getElementById("details-description").innerHTML = descriptions[currentIndex];
 
-			<button id="ar-button">Loading...</button>
-			<button id="web-launch-button" style="display: none">
-				OPEN ON META QUEST
-			</button>
-		</div>
-	</body>
+        // Update Current Dot Page
+        var dots = document.getElementsByClassName("dot");
+        for (var i = 0; i < dots.length; i++) {
+          dots[i].classList.remove("active");
+          if (i === currentIndex) {
+            dots[i].classList.add("active");
+          }
+        }
+      }
+
+      function nextDetails() {
+        currentIndex = (currentIndex + 1) % images.length;
+        updateDetails();
+      }
+  </script>
+</body>
 </html>
