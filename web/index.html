@@ -60,9 +60,9 @@
 <body>
     <div class="center">
       <div id="start-screen">
-        <img src="./img/unspoken.jpg" alt="Logo" class="logo">
+        <img src="./img/asl_signs.png" alt="Logo" class="logo">
         <h1>Unspoken</h1>
-        <p>Learn American Sign Language (ASL) in Mixed Reality</p>
+        <p>Learn the sign language alphabet from A to Z</p>
         <button class="start-button" onclick="showDetails()">Start</button>
       </div>
       <div id="details-screen" style="display: none;">
@@ -84,9 +84,13 @@
 
     <script>
       var currentIndex = 0;
-      var images = ["./img/asl_signs.png", "./img/unspoken.jpg"];
-      var titles = ["American Sign Language", "Another Title"];
-      var descriptions = ["Cool description!", "Another Description"];
+      var images = ["./img/start.gif", "./img/question.gif", "./img/answer.gif"];
+      var titles = ["How to start", "Question", "How to answer"];
+      var descriptions = [
+        "Tap your fingers together to start the lesson", 
+        "A word with a missing character will show up with a 3D item cue",
+        "Perform the appropriate sign for the missing character"
+      ];
 
       function showDetails() {
         document.getElementById("start-screen").style.display = "none";
