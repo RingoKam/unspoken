@@ -55,6 +55,13 @@
     .dot.active {
       background-color: black;
     }
+    /* Add a new style for the start button on the last page */
+    .start-button-last {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      transform: translate(50%, 50%);
+    }
   </style>
 </head>
 <body>
@@ -77,6 +84,8 @@
             <h1 id="details-title"></h1>
             <p id="details-description"></p>          
             <button class="details-button" onclick="nextDetails()">Next</button>
+            <!-- Add a condition to show the updated Start button on the last page -->
+            <button id="web-launch-button" class="start-button-last" >Start</button>
           </div>
         </div>
       </div>
@@ -111,11 +120,26 @@
             dots[i].classList.add("active");
           }
         }
-      }
+      
+
+      // Show or hide the Start button based on the current page
+      var startButton = document.getElementById("web-launch-button");
+            if (currentIndex === images.length - 1) {
+              startButton.style.display = "block";
+            } else {
+              startButton.style.display = "none";
+            }
+          }
 
       function nextDetails() {
         currentIndex = (currentIndex + 1) % images.length;
         updateDetails();
+      }
+
+      // Function to handle the web launch action for the start button
+      function webLaunch() {
+        // Add your custom logic here for launching the web app
+        console.log("Launching the web app...");
       }
   </script>
 </body>
