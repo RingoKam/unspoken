@@ -19,6 +19,7 @@
       display: flex;
       align-items: flex-start; /* Align items to the left */
       margin-top: 20px; /* Add space between image and text */
+      position: relative; /* Add position relative for container */
     }
     .image {
       max-width: 300px;
@@ -28,36 +29,118 @@
       margin-left: 20px;
       text-align: left; /* Align text to the left */
     }
+    .details-button {
+    position: absolute; /* Position absolute to align with image */
+    right: 0;
+    bottom: 0;
+    transform: translate(50%, 50%); /* Adjust positioning relative to the image */
+    }
     .details-text h1,
     .details-text p {
       align-items: flex-start; /* Align items to the left */
       margin: 10px 0; /* Add space between header and paragraph text */
+    }
+    .dots-container {
+      display: flex;
+      justify-content: center;
+    }
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin: 0 4px;
+      background-color: lightgray;
+    }
+    .dot.active {
+      background-color: black;
+    }
+    /* Add a new style for the start button on the last page */
+    .start-button-last {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      transform: translate(50%, 50%);
     }
   </style>
 <script defer src="index.bundle.js"></script></head>
 <body>
     <div class="center">
       <div id="start-screen">
-        <img src="./img/unspoken.jpg" alt="Logo" class="logo">
+        <img src="./img/asl_signs.png" alt="Logo" class="logo">
         <h1>Unspoken</h1>
-        <p>Learn American Sign Language (ASL) in Mixed Reality</p>
+        <p>Learn the sign language alphabet from A to Z</p>
         <button class="start-button" onclick="showDetails()">Start</button>
       </div>
       <div id="details-screen" style="display: none;">
         <div class="details-container">
-          <img src="./img/asl_signs.png" alt="Image" class="image">
+          <img src="" alt="Image" class="image" id="details-image">
           <div class="details-text">
-            <h1>American Sign Language</h1>
-            <p>Cool description!</p>          
+            <div class="dots-container">
+              <span class="dot active"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+            <h1 id="details-title"></h1>
+            <p id="details-description"></p>          
+            <button class="details-button" onclick="nextDetails()">Next</button>
+            <!-- Add a condition to show the updated Start button on the last page -->
+            <button id="ar-button" class="start-button-last" >Get Started</button>
+            <button id="web-launch-button" style="display: none">OPEN ON META QUEST</button>
           </div>
         </div>
       </div>
     </div>
 
     <script>
+      var currentIndex = 0;
+      var images = ["./img/start.gif", "./img/question.gif", "./img/answer.gif"];
+      var titles = ["How to start", "Question", "How to answer"];
+      var descriptions = [
+        "Tap your fingers together to start the lesson", 
+        "A word with a missing character will show up with a 3D item cue",
+        "Perform the appropriate sign for the missing character"
+      ];
+
       function showDetails() {
         document.getElementById("start-screen").style.display = "none";
         document.getElementById("details-screen").style.display = "block";
+        updateDetails();
+      }
+
+      function updateDetails() {
+        document.getElementById("details-image").src = images[currentIndex];
+        document.getElementById("details-title").innerHTML = titles[currentIndex];
+        document.getElementById("details-description").innerHTML = descriptions[currentIndex];
+
+        // Update Current Dot Page
+        var dots = document.getElementsByClassName("dot");
+        for (var i = 0; i < dots.length; i++) {
+          dots[i].classList.remove("active");
+          if (i === currentIndex) {
+            dots[i].classList.add("active");
+          }
+        }
+      
+
+      // Show or hide the Start button based on the current page
+      var startButton = document.getElementById("ar-button");
+            if (currentIndex === images.length - 1) {
+              startButton.style.display = "block";
+            } else {
+              startButton.style.display = "none";
+            }
+          }
+
+      function nextDetails() {
+        currentIndex = (currentIndex + 1) % images.length;
+        updateDetails();
+      }
+
+      // Function to handle the web launch action for the start button
+      function webLaunch() {
+        // Add your custom logic here for launching the web app
+        console.log("Launching the web app...");
       }
   </script>
 </body>

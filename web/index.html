@@ -85,7 +85,8 @@
             <p id="details-description"></p>          
             <button class="details-button" onclick="nextDetails()">Next</button>
             <!-- Add a condition to show the updated Start button on the last page -->
-            <button id="web-launch-button" class="start-button-last" >Start</button>
+            <button id="ar-button" class="start-button-last" >Get Started</button>
+            <button id="web-launch-button" style="display: none">OPEN ON META QUEST</button>
           </div>
         </div>
       </div>
@@ -123,7 +124,7 @@
       
 
       // Show or hide the Start button based on the current page
-      var startButton = document.getElementById("web-launch-button");
+      var startButton = document.getElementById("ar-button");
             if (currentIndex === images.length - 1) {
               startButton.style.display = "block";
             } else {
