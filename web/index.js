@@ -16,7 +16,10 @@ import {
 	Color,
 	Box3,
 	TextureLoader,
-	PlaneGeometry
+	PlaneGeometry,
+	Raycaster,
+	CylinderGeometry,
+	Matrix4,
 } from 'three';
 import * as TWEEN from "@tweenjs/tween.js";
 import { Handy } from './handy/src/Handy.js'
@@ -28,6 +31,7 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { setupSfx, playCorrect, playGameOver, stopChargingAudio, playChargingAudio } from './soundEffects.js';
 import { followPlayerHand, setupReferenceImage } from './assets/referenceImage.js';
 import GhostHand from './ghost-hand.js';
+import LoadingBar from './loadingbar.js';
 
 // Game states
 const GAME_STATE = {
@@ -37,6 +41,14 @@ const GAME_STATE = {
 	END: "end"
 }
 let gameState = GAME_STATE.START;
+
+const optionalFeatures = [
+	'anchors',
+	'plane-detection',
+	'mesh-detection',
+	'hit-test',
+	'local-floor'
+]
 
 // Global variables for scene components
 let camera, scene, renderer;
@@ -52,7 +64,10 @@ let anchorCreated = false
 let ghostHand = null;
 let ghostHandModel = null;
 let timeoutBoxHandId = null; // timeout for box hand
-
+let loadingBar = null;
+let questionIndex = 0;
+let hitTestTarget = null;
+let hitTestMarker = null;
 
 const successColor = new Color(0x66941B)
 const defaultColor = new Color(0x000000)
@@ -70,6 +85,7 @@ const loader = new GLTFLoader();
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath('/examples/jsm/libs/draco/');
 loader.setDRACOLoader(dracoLoader);
+
 
 const handModels = {
 	left: null,
@@ -117,7 +133,7 @@ async function init() {
 	// Ghost hand
 	ghostHand = new GhostHand(scene)
 	ghostHand.loadBoxHandModel('right').then((handModel) => {
-		handModel.scale.set(1,1,1);
+		handModel.scale.set(1, 1, 1);
 		handModel.position.set(0, 0.75, -1);
 		// We need rotate the hand based on the character
 		handModel.rotateX(Math.PI / 2);
@@ -135,7 +151,6 @@ async function init() {
 	});
 }
 
-let questionIndex = 0;
 
 // Set up the anchor
 function setupQuestionAnchor(anchor) {
@@ -148,7 +163,20 @@ function setupQuestionAnchor(anchor) {
 
 	group.add(anchorText);
 	group.add(anchorModel);
-	group.position.set(0, 0, -2);
+	console.log(anchor.position)
+	// TODO: only set the anchor position if its not null
+	// ensure the group is facing toward camera global position
+	group.position.set(anchor.position.x, anchor.position.y, anchor.position.z);
+	// calculate rotation
+	const rotationMatrix = new Matrix4();
+	const eyePos = camera.position.clone();
+	eyePos.y = 0;
+	const anchorPos = anchor.position.clone();
+	anchorPos.y = 0;
+	rotationMatrix.lookAt(eyePos, anchorPos, new Vector3(0, 1, 0));
+	group.quaternion.setFromRotationMatrix(rotationMatrix);
+	hitTestMarker.parent = null;
+
 	scene.add(group);
 
 	gameState = GAME_STATE.LOADING;
@@ -158,7 +186,15 @@ function setupQuestionAnchor(anchor) {
 		.then(data => {
 			// setupGroups(anchor)
 			questions = data
-			setupQuestion(questions[0])
+
+			// setup loading bar
+			loadingBar = new LoadingBar(scene)
+			var bar = loadingBar.SetupLoadingBar(questions.length)
+			group.add(bar)
+			bar.position.set(0, 0, 0.4)
+			loadingBar.UpdateLoadingBar(questionIndex + 1)
+
+			setupQuestion(questions[questionIndex])
 		});
 }
 
@@ -210,7 +246,7 @@ async function setupQuestion(data) {
 			ghostHand.showBoxHandModel();
 		}, 5000);
 
-		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
+		cameraWorldPosition.setFromMatrixPosition(camera.matrixWorld);
 		console.log(cameraWorldPosition)
 		ghostHandModel.position.set(cameraWorldPosition.x + 0.1, cameraWorldPosition.y - 0.1, cameraWorldPosition.z - 0.3)
 		// based on the position of the user camera, set it infront of it
@@ -295,18 +331,13 @@ function setupARButton() {
 
 	ARButton.convertToARButton(arButton, renderer, {
 		requiredFeatures: [
-			'anchors',
-			'plane-detection',
-			'hit-test',
-			'mesh-detection',
 			'hand-tracking',
-			'local-floor',
-			'hand-tracking'
+			...optionalFeatures
 		],
 		onUnsupported: () => {
 			arButton.style.display = 'none';
 			webLaunchButton.style.display = 'block';
-		},
+		}
 	});
 }
 
@@ -316,7 +347,6 @@ function setupARButton() {
 function setupController() {
 	controller1 = renderer.xr.getController(0);
 	scene.add(controller1);
-
 	controller2 = renderer.xr.getController(1);
 	scene.add(controller2);
 
@@ -340,10 +370,22 @@ function setupController() {
 	// console.log(hand1);
 
 	leftHand.addEventListener('pinchend', function () {
+		// Delete all anchors
+		ratk.anchors.forEach((anchor) => {
+			console.log(anchor.anchorID);
+			ratk.deleteAnchor(anchor);
+		});
+
 		if (anchorCreated == false) {
+			console.log("pinch end")
+			if (hitTestTarget == null) {
+				console.warn("hit test target is null? how come");
+				return;
+			}
+
 			pendingAnchorData = {
-				position: leftHand.position.clone(),
-				quaternion: leftHand.quaternion.clone(),
+				position: hitTestTarget.position.clone(),
+				quaternion: hitTestTarget.quaternion.clone(),
 			};
 			anchorCreated = true;
 		}
@@ -356,6 +398,8 @@ function setupController() {
 	scene.add(controllerGrip2);
 
 	rightHand = renderer.xr.getHand(1);
+	rightHand.addEventListener('connected', handleControllerConnected);
+	rightHand.addEventListener('disconnected', handleControllerDisconnected);
 	rightHand.userData.currentHandModel = 0;
 	scene.add(rightHand);
 
@@ -372,13 +416,13 @@ function setupController() {
 	}
 
 	rightHand.addEventListener('pinchend', function () {
-		if (anchorCreated == false) {
-			pendingAnchorData = {
-				position: leftHand.position.clone(),
-				quaternion: leftHand.quaternion.clone(),
-			};
-			anchorCreated = true;
-		}
+		// if (this.hitTestTarget) {
+		// 	console.log(this.hitTestTarget);
+		// 	pendingAnchorData = {
+		// 		position: this.hitTestTarget.position.clone(),
+		// 		quaternion: this.hitTestTarget.quaternion.clone(),
+		// 	};
+		// }
 	});
 }
 
@@ -387,7 +431,7 @@ function setupHandy() {
 	Handy.makeHandy(leftHand)
 	Handy.makeHandy(rightHand)
 
-	
+
 	// if (handyLeft == null) {
 	// 	handyLeft = Handy.hands.getLeft()
 	// 	// if (handyLeft) {
@@ -416,16 +460,21 @@ function setupHandy() {
  * Handles controller connection events.
  */
 function handleControllerConnected(event) {
+	// start raycasting from hand
 	ratk
 		.createHitTestTargetFromControllerSpace(event.data.handedness)
-		.then((hitTestTarget) => {
-			this.hitTestTarget = hitTestTarget;
-			const geometry = new SphereGeometry(0.05);
+		.then((testTarget) => {
+			this.hitTestTarget = testTarget;
+			const geometry = new CylinderGeometry(0.2, 0.2, 0.01, 32);
 			const material = new MeshBasicMaterial({
 				transparent: true,
 				opacity: 0.5,
 			});
-			const hitTestMarker = new Mesh(geometry, material);
+			
+			// Get a reference to the hit target outside of the scope of this function
+			hitTestMarker = new Mesh(geometry, material);
+			hitTestTarget = this.hitTestTarget;
+
 			this.hitTestTarget.add(hitTestMarker);
 		});
 }
@@ -472,13 +521,8 @@ function setupRATK() {
 		setTimeout(() => {
 			ratk.restorePersistentAnchors().then(() => {
 				ratk.anchors.forEach((anchor) => {
-					console.log(anchor.anchorID);
-					ratk.deleteAnchor(anchor);
+					buildAnchorMarker(anchor, true);
 				});
-				// if (ratk.anchors.length > 0) {
-				// 	anchorCreated = true;
-				// 	setupAnchor(ratk.anchors[0]);
-				// }
 			});
 		}, 1000);
 		setTimeout(() => {
@@ -487,7 +531,7 @@ function setupRATK() {
 			}
 		}, 5000);
 	});
-}
+};
 
 /**
  * Handles the addition of a new plane detected by RATK.
@@ -514,14 +558,6 @@ function handleMeshAdded(mesh) {
 	const semanticLabel = new Text();
 	meshMesh.add(semanticLabel);
 	meshMesh.visible = false;
-	// semanticLabel.text = mesh.semanticLabel;
-	// semanticLabel.anchorX = 'center';
-	// semanticLabel.anchorY = 'bottom';
-	// semanticLabel.fontSize = 0.1;
-	// semanticLabel.color = 0x000000;
-	// semanticLabel.sync();
-	// semanticLabel.position.y = meshMesh.geometry.boundingBox.max.y;
-	// mesh.userData.semanticLabelMesh = semanticLabel;
 }
 
 /**
@@ -657,7 +693,7 @@ function listenRightHand(delta) {
 }
 
 function clearTimeoutBoxHand() {
-	if(timeoutBoxHandId !== null) {
+	if (timeoutBoxHandId !== null) {
 		clearTimeout(timeoutBoxHandId);
 		timeoutBoxHandId = null;
 	}
@@ -670,7 +706,7 @@ function endGame() {
 		anchorModel.remove(anchorModel.children[0])
 		anchorText.text = "Thanks for Playing";
 		anchorText.sync();
-	})	
+	})
 }
 
 function nextQuestion() {
@@ -684,6 +720,7 @@ function nextQuestion() {
 	// next question
 	setTimeout(() => {
 		questionIndex += 1;
+		loadingBar.UpdateLoadingBar(questionIndex + 1)
 		setupQuestion(questions[questionIndex]);
 	}, 1000);
 }
