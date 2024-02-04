@@ -70783,9 +70783,6 @@ function setupARButton() {
 			webLaunchButton.style.display = 'block';
 		},
 	});
-
-	// Update AR Button Text and Styling
-	arButton.textContent = 'Get Started'
 }
 
 /**
