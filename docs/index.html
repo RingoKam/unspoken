@@ -15,28 +15,60 @@
       width: 250px;
       height: 250px;
     }
+    .image {
+      height: 450px;
+      width: 450px;
+      margin-right: 50px;
+    }
+    .back-link {
+      color: black; /* Sets the font color to black */
+      text-decoration: none; /* Removes underline */
+      outline: none; /* Removes focus outline */
+      display: inline-block; /* Ensures the background color area takes the dimensions of its content */
+      padding: 5px 10px; /* Adjust the padding as desired */
+      border-radius: 10px; /* Sets the border radius to make the area rounded */
+      position: absolute; /* Position absolute to align with image */
+      bottom: 0;
+      transform: translate(0%, 50%); /* Adjust positioning relative to the image */
+    }
+    .back-link:hover {
+      color: white; 
+      background-color: black;;
+    }
     .details-container {
       display: flex;
       align-items: flex-start; /* Align items to the left */
       margin-top: 20px; /* Add space between image and text */
       position: relative; /* Add position relative for container */
-    }
-    .image {
-      max-width: 300px;
-      max-height: 300px;
+      justify-content: flex-start;
     }
     .details-text {
-      margin-left: 20px;
+      margin-left: 50px;
       text-align: left; /* Align text to the left */
+      max-width: 250px; /* Set the max-width */
+      margin-left: auto; /* Start slightly right of the center */
     }
     .details-button {
-    position: absolute; /* Position absolute to align with image */
-    right: 0;
-    bottom: 0;
-    transform: translate(50%, 50%); /* Adjust positioning relative to the image */
+      background-color: black;
+      color: white;
+      font-size: 20px;
+      border-radius: 45px;
+      padding: 5px 45px;
+      position: absolute; /* Position absolute to align with image */
+      right: 0;
+      bottom: 0;
+      transform: translate(50%, 50%); /* Adjust positioning relative to the image */
     }
-    .details-text h1,
+    .details-button:hover {
+      background-color: gray;
+      color: black;
+    }
+    .details-text h1 {
+      align-items: flex-start; /* Align items to the left */
+      margin: 10px 0; /* Add space between header and paragraph text */
+    }
     .details-text p {
+      font-size: 20px;
       align-items: flex-start; /* Align items to the left */
       margin: 10px 0; /* Add space between header and paragraph text */
     }
@@ -46,14 +78,25 @@
     }
     .dot {
       display: inline-block;
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       margin: 0 4px;
       background-color: lightgray;
     }
     .dot.active {
       background-color: black;
+    }
+    .start-button {
+      background-color: black;
+      color: white;
+      border-radius: 45px;
+      padding: 5px 45px;
+      font-size: 20px;
+    }
+    .start-button:hover {
+      background-color: gray;
+      color: black;
     }
     /* Add a new style for the start button on the last page */
     .start-button-last {
@@ -62,6 +105,9 @@
       bottom: 0;
       transform: translate(50%, 50%);
     }
+    .start-text {
+      font-size: 20px;
+    }
   </style>
 <script defer src="index.bundle.js"></script></head>
 <body>
@@ -69,34 +115,65 @@
       <div id="start-screen">
         <img src="./img/asl_signs.png" alt="Logo" class="logo">
         <h1>Unspoken</h1>
-        <p>Learn the sign language alphabet from A to Z</p>
+        <p class="start-text">Learn the sign language alphabet from A to Z in Mixed Reality</p>
         <button class="start-button" onclick="showDetails()">Start</button>
       </div>
       <div id="details-screen" style="display: none;">
         <div class="details-container">
           <img src="" alt="Image" class="image" id="details-image">
           <div class="details-text">
+            
+            <!-- Show Current Page as Dots -->
             <div class="dots-container">
               <span class="dot active"></span>
               <span class="dot"></span>
               <span class="dot"></span>
+              <span class="dot"></span>
             </div>
+
+            <!-- Details Title -->
             <h1 id="details-title"></h1>
+            <br/>
+
+            <!-- Details Description -->
             <p id="details-description"></p>          
-            <button class="details-button" onclick="nextDetails()">Next</button>
+
+            <!-- Back Link -->
+            <div class="details-navigation">
+              <a href="#" id="back-link" class="back-link" onclick="goBack()">← Back</a>
+            </div>
+
+            <!-- Next Button -->
+            <div class="details-button-container">
+              <button class="details-button" onclick="nextDetails()">Next</button>
+            </div>           
+            
+            <!-- Launch App Button -->
             <!-- Add a condition to show the updated Start button on the last page -->
             <button id="ar-button" class="start-button-last" >Get Started</button>
-            <button id="web-launch-button" style="display: none">OPEN ON META QUEST</button>
+            <button id="web-launch-button" style="display: none">Open on Meta Quest</button>
           </div>
         </div>
       </div>
     </div>
 
     <script>
+      // Variables
       var currentIndex = 0;
-      var images = ["./img/start.gif", "./img/question.gif", "./img/answer.gif"];
-      var titles = ["How to start", "Question", "How to answer"];
+      var images = [
+        "./img/asl_signs.png",
+        "./img/start.gif", 
+        "./img/question.gif", 
+        "./img/answer.gif"
+      ];
+      var titles = [
+        "American Sign Language",
+        "How to Start", 
+        "Question", 
+        "How to Answer"
+      ];
       var descriptions = [
+        "The American Sign Language (ASL) alphabet, also known as fingerspelling, is a system of representing the 26 letters of the English alphabet using specific handshapes. Each letter is assigned a unique handshape, and signers spell out words by forming these handshapes in the air.",
         "Tap your fingers together to start the lesson", 
         "A word with a missing character will show up with a 3D item cue",
         "Perform the appropriate sign for the missing character"
@@ -111,7 +188,9 @@
       function updateDetails() {
         document.getElementById("details-image").src = images[currentIndex];
         document.getElementById("details-title").innerHTML = titles[currentIndex];
-        document.getElementById("details-description").innerHTML = descriptions[currentIndex];
+        var description = descriptions[currentIndex];
+        var descriptionHTML = description.split(". ").join(".</p><br><p>");
+        document.getElementById("details-description").innerHTML = "<p>" + descriptionHTML + "</p>";
 
         // Update Current Dot Page
         var dots = document.getElementsByClassName("dot");
@@ -121,16 +200,33 @@
             dots[i].classList.add("active");
           }
         }
-      
 
-      // Show or hide the Start button based on the current page
-      var startButton = document.getElementById("ar-button");
-            if (currentIndex === images.length - 1) {
-              startButton.style.display = "block";
-            } else {
-              startButton.style.display = "none";
-            }
-          }
+        // Show or hide the Start button based on the current page
+        var startButton = document.getElementById("ar-button");
+        if (currentIndex === images.length - 1) {
+          startButton.style.display = "block";
+        } else {
+          startButton.style.display = "none";
+        }
+
+        // Show or hide the Back link based on the current page
+        var backLink = document.getElementById("back-link");
+        if (currentIndex === 0) {
+          backLink.style.display = "none";
+        } else {
+          backLink.style.display = "inline";
+        }
+      }
+
+      function goBack() {
+        if (currentIndex === 0) {
+          // If on the first page, do nothing
+          return;
+        } else {
+          currentIndex--;
+          updateDetails();
+        }
+      }
 
       function nextDetails() {
         currentIndex = (currentIndex + 1) % images.length;
