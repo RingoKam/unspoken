@@ -86,7 +86,7 @@
         "word": "PIANO",
         "answer": "P",
         "model": "/models/piano.glb",
-        "credit": "https://poly.pizza/m/1YoE664mJTd"
+        "credit": "https://poly.pizza/m/7U-93vxPOER"
     },
     {
         "word": "QUEST",
@@ -131,10 +131,10 @@
         "credit": "https://sketchfab.com/3d-models/low-poly-whale-325215f66cd34dccb59afeab1d9be10f"
     },
     {
-        "word": "XYLOPHONE",
+        "word": "SAXOPHONE",
         "answer": "X",
-        "model": "/models/xylophone.glb",
-        "credit": "https://sketchfab.com/3d-models/kid-s-toy-xylophone-b4ce27325fc9432ba62d9339447da09a"
+        "model": "/models/saxophone.glb",
+        "credit": "https://poly.pizza/m/6A2UAKdCNy7"
     },
     {
         "word": "YACHT",
