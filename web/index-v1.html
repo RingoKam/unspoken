@@ -1,0 +1,91 @@
+<!-- 
+  Copyright (c) Meta Platforms, Inc. and affiliates.
+
+  This source code is licensed under the MIT license found in the
+  LICENSE file in the root directory of this source tree.
+-->
+
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, shrink-to-fit=no"
+		/>
+		<title>Unspoken</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				margin: 0;
+				line-height: 1.2;
+			}
+			strong {
+				font-weight: bold;
+			}
+			body {
+                font-family: 'Roboto', sans-serif;
+                margin: 0px;
+                line-height: 1.2;
+                background-color: #f9f9f9;
+            }
+            .container {
+                position: fixed; 
+                top: 10px; 
+                left: 10px;
+				background-color: black;
+				color: white;
+				padding: 20px;
+				border-radius: 10px;
+				height: calc(100vh - 60px);
+				width: calc(100vw - 60px);
+            }
+            button {
+                background-color: #4CAF50; /* Green */
+                border: none;
+                color: white;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;
+            }
+            button:hover {
+                background-color: #45a049;
+            }
+			.sign-img {
+				min-height: 250px;
+				height: 45vh;
+				max-height: 500px;
+			}
+		</style>
+	</head>
+	<body style="margin: 0">
+		<div id="scene-container" style="display: block"></div>
+		<div class="container">
+			<header>
+				<h1>Unspoken</h1>
+				<p>Learn the sign language alphabet from A to Z</p>
+			</header>
+
+			<p>
+				The American Sign Language (ASL) alphabet, also known as fingerspelling, is a system of representing the 26 letters of the English alphabet using specific handshapes. Each letter is assigned a unique handshape, and signers spell out words by forming these handshapes in the air.
+			</p>
+
+			<p>
+				<img class="sign-img" src="./img/asl_signs.png">
+			</p>
+
+			<p>
+				<strong>How to use:</strong> Tap your fingers together to start the lesson. Perform the appropriate sign for the missing character. 
+			</p>
+
+			<button id="ar-button">Loading...</button>
+			<button id="web-launch-button" style="display: none">
+				OPEN ON META QUEST
+			</button>
+		</div>
+	</body>
+</html>
