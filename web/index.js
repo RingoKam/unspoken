@@ -79,22 +79,25 @@ const handModels = {
 let listenPose = false
 
 // Initialize and animate the scene
-init().then(() => {
-	animate();
-
-	// just for testing purpose, lets listen for space key
-	window.addEventListener('keydown', (event) => {
-		if (event.code == "Space" && window._debug) {
-			if (questionIndex >= questions.length - 1) {
-				playGameOver();
-				endGame();
-			} else {
-				playCorrect();
-				nextQuestion();
+window.startGame = () => {
+	init().then(() => {
+		animate();
+		// just for testing purpose, lets listen for space key
+		window.addEventListener('keydown', (event) => {
+			if (event.code == "Space" && window._debug) {
+				if (questionIndex >= questions.length - 1) {
+					playGameOver();
+					endGame();
+				} else {
+					playCorrect();
+					nextQuestion();
+				}
 			}
-		}
+		});
 	});
-});
+}
+
+
 
 /**
  * Initializes the scene, camera, renderer, lighting, and AR functionalities.
@@ -117,7 +120,7 @@ async function init() {
 	// Ghost hand
 	ghostHand = new GhostHand(scene)
 	ghostHand.loadBoxHandModel('right').then((handModel) => {
-		handModel.scale.set(1,1,1);
+		handModel.scale.set(1, 1, 1);
 		handModel.position.set(0, 0.75, -1);
 		// We need rotate the hand based on the character
 		handModel.rotateX(Math.PI / 2);
@@ -210,7 +213,7 @@ async function setupQuestion(data) {
 			ghostHand.showBoxHandModel();
 		}, 5000);
 
-		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
+		cameraWorldPosition.setFromMatrixPosition(camera.matrixWorld);
 		console.log(cameraWorldPosition)
 		ghostHandModel.position.set(cameraWorldPosition.x + 0.1, cameraWorldPosition.y - 0.1, cameraWorldPosition.z - 0.3)
 		// based on the position of the user camera, set it infront of it
@@ -293,6 +296,8 @@ function setupARButton() {
 		);
 	};
 
+	// display the AR button
+	arButton.style.display = 'block';
 	ARButton.convertToARButton(arButton, renderer, {
 		requiredFeatures: [
 			'anchors',
@@ -387,7 +392,7 @@ function setupHandy() {
 	Handy.makeHandy(leftHand)
 	Handy.makeHandy(rightHand)
 
-	
+
 	// if (handyLeft == null) {
 	// 	handyLeft = Handy.hands.getLeft()
 	// 	// if (handyLeft) {
@@ -657,7 +662,7 @@ function listenRightHand(delta) {
 }
 
 function clearTimeoutBoxHand() {
-	if(timeoutBoxHandId !== null) {
+	if (timeoutBoxHandId !== null) {
 		clearTimeout(timeoutBoxHandId);
 		timeoutBoxHandId = null;
 	}
@@ -670,7 +675,7 @@ function endGame() {
 		anchorModel.remove(anchorModel.children[0])
 		anchorText.text = "Thanks for Playing";
 		anchorText.sync();
-	})	
+	})
 }
 
 function nextQuestion() {
