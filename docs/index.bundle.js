@@ -76,12 +76,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ GhostHand)
 /* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! three/addons/loaders/GLTFLoader.js */ "./node_modules/three/examples/jsm/loaders/GLTFLoader.js");
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! three/addons/loaders/GLTFLoader.js */ "./node_modules/three/examples/jsm/loaders/GLTFLoader.js");
 /* harmony import */ var _handy_src_Handy_poses_left_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./handy/src/Handy-poses-left.js */ "./handy/src/Handy-poses-left.js");
 /* harmony import */ var _handy_src_Handy_poses_right_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./handy/src/Handy-poses-right.js */ "./handy/src/Handy-poses-right.js");
-/* harmony import */ var _tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tweenjs/tween.js */ "./node_modules/@tweenjs/tween.js/dist/tween.esm.js");
-
 
 
 
@@ -134,10 +132,10 @@ class GhostHand {
         this.scene = scene;
         this.bones = [];
         this.boneBox = {};
-        this.loader = new three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_3__.GLTFLoader();
+        this.loader = new three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_2__.GLTFLoader();
         this.handedness = null;
         this.loader.setPath(DEFAULT_HAND_PROFILE_PATH);
-        this.handModel = new three__WEBPACK_IMPORTED_MODULE_4__.Group();
+        this.handModel = new three__WEBPACK_IMPORTED_MODULE_3__.Group();
         this.fingerLinesObj = null;
         // instancedMesh for boxes
         this.boxInstancedMesh = null;
@@ -151,17 +149,17 @@ class GhostHand {
         this.handedness = handedness;
 
         return new Promise((resolve, reject) => {
-            const geometry = new three__WEBPACK_IMPORTED_MODULE_4__.SphereGeometry(0.005, 10, 10);
-            this.jointMaterial = new three__WEBPACK_IMPORTED_MODULE_4__.MeshBasicMaterial({
+            const geometry = new three__WEBPACK_IMPORTED_MODULE_3__.SphereGeometry(0.005, 10, 10);
+            this.jointMaterial = new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial({
                 color: '#95c6eb',
                 transparent: true,
                 opacity: 0.7,
                 visible: false
             });
 
-            const handMesh = new three__WEBPACK_IMPORTED_MODULE_4__.InstancedMesh(geometry, this.jointMaterial, joints.length);
+            const handMesh = new three__WEBPACK_IMPORTED_MODULE_3__.InstancedMesh(geometry, this.jointMaterial, joints.length);
             handMesh.frustumCulled = false;
-            handMesh.instanceMatrix.setUsage(three__WEBPACK_IMPORTED_MODULE_4__.DynamicDrawUsage); // will be updated every frame
+            handMesh.instanceMatrix.setUsage(three__WEBPACK_IMPORTED_MODULE_3__.DynamicDrawUsage); // will be updated every frame
             handMesh.castShadow = true;
             handMesh.receiveShadow = true;
             this.boxInstancedMesh = handMesh
@@ -179,7 +177,7 @@ class GhostHand {
         const selectedPose = poses.find(pose => pose.names.find(name => name == poseName));
         const jointPositions = selectedPose.jointPositions;
 
-        const dummy = new three__WEBPACK_IMPORTED_MODULE_4__.Object3D()
+        const dummy = new three__WEBPACK_IMPORTED_MODULE_3__.Object3D()
 
         for (let i = 0; i < joints.length; i++) {
             const jointPos = jointPositions[i];
@@ -200,14 +198,14 @@ class GhostHand {
     updatePointInBetween() {
         // Draw wrist line
         // SetPixelRatio
-        this.lineMaterial = new three__WEBPACK_IMPORTED_MODULE_4__.LineBasicMaterial({ 
+        this.lineMaterial = new three__WEBPACK_IMPORTED_MODULE_3__.LineBasicMaterial({ 
             color: "white", 
             visible: true,
             linewidth: 2
         });
-        const originPosition = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0);
-        const dummy = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3()
-        let matrix = new three__WEBPACK_IMPORTED_MODULE_4__.Matrix4();
+        const originPosition = new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 0);
+        const dummy = new three__WEBPACK_IMPORTED_MODULE_3__.Vector3()
+        let matrix = new three__WEBPACK_IMPORTED_MODULE_3__.Matrix4();
 
         const { line, origin } = wristLine
         this.boxInstancedMesh.getMatrixAt(origin, matrix);
@@ -217,8 +215,8 @@ class GhostHand {
         // create the 5 lines for the fingers
         if(this.fingerLinesObj == null) {
             this.fingerLinesObj = Array.from({length: 10}).map(() => {
-                const geometry = new three__WEBPACK_IMPORTED_MODULE_4__.BufferGeometry();
-                const line = new three__WEBPACK_IMPORTED_MODULE_4__.Line(geometry, this.lineMaterial);
+                const geometry = new three__WEBPACK_IMPORTED_MODULE_3__.BufferGeometry();
+                const line = new three__WEBPACK_IMPORTED_MODULE_3__.Line(geometry, this.lineMaterial);
                 line.frustumCulled = false;
                 line.castShadow = false;
                 line.receiveShadow = false;
@@ -228,7 +226,7 @@ class GhostHand {
         }
         // draw a line that connect the origin with each line
         for (let i = 0; i < line.length; i++) {
-            const linePosition = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0);
+            const linePosition = new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 0);
             this.boxInstancedMesh.getMatrixAt(line[i], matrix);
             dummy.setFromMatrixPosition(matrix);
             linePosition.copy(dummy)
@@ -249,7 +247,7 @@ class GhostHand {
             for (let i = 0; i < line.length; i++) {
                 // get the hand instance
                 // dummy.position.set(0, 0, 0);
-                const linePosition = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0);
+                const linePosition = new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 0);
                 this.boxInstancedMesh.getMatrixAt(line[i], matrix);
                 dummy.setFromMatrixPosition(matrix);
                 linePosition.copy(dummy)
@@ -276,10 +274,10 @@ class GhostHand {
         return new Promise((resolve, reject) => {
             this.loader.load(`${handedness}.glb`, gltf => {
                 const object = gltf.scene.children[0];
-                const handModel = new three__WEBPACK_IMPORTED_MODULE_4__.Group();
+                const handModel = new three__WEBPACK_IMPORTED_MODULE_3__.Group();
                 handModel.add(object);
 
-                const material = new three__WEBPACK_IMPORTED_MODULE_4__.MeshBasicMaterial({
+                const material = new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial({
                     color: '#95c6eb',
                     transparent: true,
                     opacity: 0.4

@@ -95,22 +95,25 @@ const handModels = {
 let listenPose = false
 
 // Initialize and animate the scene
-init().then(() => {
-	animate();
-
-	// just for testing purpose, lets listen for space key
-	window.addEventListener('keydown', (event) => {
-		if (event.code == "Space" && window._debug) {
-			if (questionIndex >= questions.length - 1) {
-				playGameOver();
-				endGame();
-			} else {
-				playCorrect();
-				nextQuestion();
+window.startGame = () => {
+	init().then(() => {
+		animate();
+		// just for testing purpose, lets listen for space key
+		window.addEventListener('keydown', (event) => {
+			if (event.code == "Space" && window._debug) {
+				if (questionIndex >= questions.length - 1) {
+					playGameOver();
+					endGame();
+				} else {
+					playCorrect();
+					nextQuestion();
+				}
 			}
-		}
+		});
 	});
-});
+}
+
+
 
 /**
  * Initializes the scene, camera, renderer, lighting, and AR functionalities.
@@ -329,6 +332,8 @@ function setupARButton() {
 		);
 	};
 
+	// display the AR button
+	arButton.style.display = 'block';
 	ARButton.convertToARButton(arButton, renderer, {
 		requiredFeatures: [
 			'hand-tracking',

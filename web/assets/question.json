@@ -50,7 +50,7 @@
         "word": "JELLYFISH",
         "answer": "J",
         "model": "/models/jellyfish.glb",
-        "credit": "https://sketchfab.com/3d-models/jellyfish-8aa47e5107bc422ba523231e569c5499"
+        "credit": "https://poly.pizza/m/5PxIqPamrag"
     },
     {
         "word": "KEY",
@@ -86,7 +86,7 @@
         "word": "PIANO",
         "answer": "P",
         "model": "/models/piano.glb",
-        "credit": "https://sketchfab.com/3d-models/piano-low-poly-ae34e376884b4337a24b38fe1d3ecec7#download"
+        "credit": "https://poly.pizza/m/7U-93vxPOER"
     },
     {
         "word": "QUEST",
@@ -110,7 +110,7 @@
         "word": "TACO",
         "answer": "T",
         "model": "/models/taco.glb",
-        "credit": "https://sketchfab.com/3d-models/taco-dda5d6db7f3141d397f15985e22bbd71"
+        "credit": "https://poly.pizza/m/56s2tfG_ofG"
     },
     {
         "word": "UMBRELLA",
@@ -131,21 +131,21 @@
         "credit": "https://sketchfab.com/3d-models/low-poly-whale-325215f66cd34dccb59afeab1d9be10f"
     },
     {
-        "word": "XYLOPHONE",
+        "word": "SAXOPHONE",
         "answer": "X",
-        "model": "/models/xylophone.glb",
-        "credit": "https://sketchfab.com/3d-models/kid-s-toy-xylophone-b4ce27325fc9432ba62d9339447da09a"
+        "model": "/models/saxophone.glb",
+        "credit": "https://poly.pizza/m/6A2UAKdCNy7"
     },
     {
-        "word": "YETI",
+        "word": "YACHT",
         "answer": "Y",
         "model": "/models/yacht.glb",
         "credit": "https://poly.pizza/m/9znU2c-dTSR"
     },
     {
-        "word": "ZERO",
+        "word": "ZEBRA",
         "answer": "Z",
-        "model": "/models/zero.glb",
-        "credit": "https://sketchfab.com/3d-models/number-0-zero-48e372695c0649debdb933edc1d27504"
+        "model": "/models/zebra.glb",
+        "credit": "https://poly.pizza/m/8Ut7mhb-aqK"
     }    
 ]
