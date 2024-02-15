@@ -136,27 +136,6 @@
       color: black;
     }
 
-    /* Add a new style for the start button on the last page */
-    .start-button-last {
-      /* Style */
-      background-color: black;
-      color: white;
-      font-size: 20px;
-      border-radius: 45px;
-      padding: 5px 45px;
-      /* Position */
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      transform: translate(50%, 50%);
-    }
-
-    .start-button-last:hover {
-      /* Style */
-      background-color: gray;
-      color: black;
-    }
-
     .start-text {
       font-size: 20px;
     }
@@ -198,13 +177,12 @@
 
           <!-- Next Button -->
           <div class="details-button-container">
-            <button class="details-button" onclick="nextDetails()">Next</button>
+            <button id="next-button" class="details-button" onclick="nextDetails()">Next</button>
+            <!-- launch XR experience -->
+            <button id="ar-button" class="details-button" style="display: none">Get Started</button>
+            <button id="vr-button" class="details-button" style="display: none">Get Started</button>
+            <button id="web-launch-button" class="details-button" style="display: none">Open on Meta Quest</button>
           </div>
-
-          <!-- Launch App Button -->
-          <!-- Add a condition to show the updated Start button on the last page -->
-          <button id="ar-button" class="start-button-last" style="display: none">Get Started</button>
-          <button id="web-launch-button" class="start-button-last" style="display: none">Open on Meta Quest</button>
         </div>
       </div>
     </div>
@@ -256,6 +234,7 @@
  
       if(currentIndex === images.length - 1) {
         // Launch experience from index.js
+        document.getElementById("next-button").style.display = "none";
         startGame();
       } 
 
