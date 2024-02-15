@@ -1,23 +1,17 @@
 import { ARButton, RealityAccelerator, VRButton } from 'ratk';
 import {
 	BoxGeometry,
-	BufferGeometry,
 	DirectionalLight,
 	Group,
 	HemisphereLight,
-	Line,
 	Mesh,
 	MeshBasicMaterial,
 	PerspectiveCamera,
 	Scene,
-	SphereGeometry,
 	Vector3,
 	WebGLRenderer,
 	Color,
 	Box3,
-	TextureLoader,
-	PlaneGeometry,
-	Raycaster,
 	CylinderGeometry,
 	Matrix4,
 } from 'three';
@@ -28,7 +22,7 @@ import { XRHandModelFactory } from 'three/examples/jsm/webxr/XRHandModelFactory.
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { setupSfx, playCorrect, playGameOver, stopChargingAudio, playChargingAudio } from './soundEffects.js';
-import { followPlayerHand, setupReferenceImage } from './assets/referenceImage.js';
+import { setupReferenceImage } from './assets/referenceImage.js';
 import GhostHand from './ghost-hand.js';
 import LoadingBar from './loadingbar.js';
 
@@ -55,13 +49,10 @@ let isVR = false;
 // Global variables for scene components
 let camera, scene, renderer;
 let cameraWorldPosition = new Vector3();
-let controller1, controller2;
 let leftHand, rightHand;
-let controllerGrip1, controllerGrip2;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
 let handyLeft, handyRight;
-const groupList = []
 let anchorCreated = false
 let ghostHand = null;
 let ghostHandModel = null;
@@ -70,6 +61,8 @@ let loadingBar = null;
 let questionIndex = 0;
 let hitTestTarget = null;
 let hitTestMarker = null;
+let hitTestMarkerText = null;
+let listenPose = false;
 
 const successColor = new Color(0x66941B)
 const defaultColor = new Color(0x000000)
@@ -87,14 +80,6 @@ const loader = new GLTFLoader();
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath('/examples/jsm/libs/draco/');
 loader.setDRACOLoader(dracoLoader);
-
-
-const handModels = {
-	left: null,
-	right: null
-};
-
-let listenPose = false
 
 // Initialize and animate the scene
 window.startGame = () => {
@@ -115,8 +100,6 @@ window.startGame = () => {
 	});
 }
 
-
-
 /**
  * Initializes the scene, camera, renderer, lighting, and AR functionalities.
  */
@@ -132,7 +115,6 @@ async function init() {
 	// We need to setup VR/AR mode first, once thats decided
 	// then we can setup the controller and the rest of the scene
 	setupController();
-	setupHandy();
 	await setupSfx(camera);
 	window.addEventListener('resize', onWindowResize);
 	setupReferenceImage(scene);
@@ -184,6 +166,14 @@ function setupQuestionAnchor(anchor) {
 		rotationMatrix.lookAt(eyePos, anchorPos, new Vector3(0, 1, 0));
 		group.quaternion.setFromRotationMatrix(rotationMatrix);
 		hitTestMarker.parent = null; // detach from the hitTestTarget
+		
+		// detach from the hitTestTarget
+		hitTestMarkerText.parent = null; 
+		hitTestTarget.remove(hitTestMarkerText)
+		hitTestMarkerText.dispose();
+		// TODO: animate the hitTestMarker 
+
+
 	} else {
 		group.position.set(0, 0, -2.5);
 	}
@@ -244,6 +234,7 @@ async function setupQuestion(data) {
 		anchorText.text = "Loading..."
 		anchorText.sync()
 	}
+
 	// TODO: instead of loading up the question one by one, 
 	// We should load all the question at once to speed things up?
 	loader.load(`./${data.model}`, function (gltf) {
@@ -261,8 +252,6 @@ async function setupQuestion(data) {
 		console.log(cameraWorldPosition)
 		ghostHandModel.position.set(cameraWorldPosition.x + 0.1, cameraWorldPosition.y - 0.1, cameraWorldPosition.z - 0.3)
 		// based on the position of the user camera, set it infront of it
-
-
 		correctAnswer = data.answer
 		anchorText.text = question
 		anchorText.sync();
@@ -392,7 +381,7 @@ function setupHand(hand) {
 	hand.add(model);
 	scene.add(hand);
 
-	hand.addEventListener('connected', function(event) {
+	hand.addEventListener('connected', function (event) {
 		// determine if it is left or right hand
 		const handedness = event.data.handedness
 		if (handedness == "left") {
@@ -429,34 +418,6 @@ function setupHand(hand) {
 	});
 }
 
-function setupHandy() {
-	// once we make handy
-
-
-	// if (handyLeft == null) {
-	// 	handyLeft = Handy.hands.getLeft()
-	// 	// if (handyLeft) {
-	// 	// 	console.log("found left!")
-	// 	// 	handyLeft.addEventListener("pose changed", (event) => {
-	// 	// 		// console.log(event.message)
-	// 	// 	})
-	// 	// }
-	// }
-	if (handyRight == null) {
-		handyRight = Handy.hands.getRight()
-		// if (handyRight) {
-		// 	console.log("found right!")
-		// 	handyRight.addEventListener("pose changed", (event) => {
-		// 		// console.log(event.message)
-		// 	})
-		// }
-	}
-
-	// if (handyLeft == null) {
-	// 	handyLeft = Handy.hands.getLeft()
-	// }
-}
-
 /**
  * Handles controller connection events.
  */
@@ -475,6 +436,15 @@ function handleControllerConnected(event) {
 			// Get a reference to the hit target outside of the scope of this function
 			hitTestMarker = new Mesh(geometry, material);
 			hitTestTarget = this.hitTestTarget;
+
+			hitTestMarkerText = new Text();
+			hitTestMarkerText.text = "Pinch Right Hand to start";
+			hitTestMarkerText.frustumCulled = false	// always render
+			hitTestMarkerText.anchorX = 'center';
+			hitTestMarkerText.anchorY = 'bottom';
+			hitTestMarkerText.fontSize = 0.1	
+			this.hitTestTarget.add(hitTestMarkerText);
+			hitTestMarkerText.position.set(0, 0.2, 0);
 
 			this.hitTestTarget.add(hitTestMarker);
 		});
@@ -599,67 +569,13 @@ function render(arg) {
 	updateSemanticLabels();
 	const session = renderer.xr.getSession();
 
-	// TODO: there are some logic here that we use to setup the hands
-	// maybe we can move this to a separate function
-	// Let's disable left hand input for now
-	// LEFT HAND
-	// if (handyLeft == null) {
-	// 	handyLeft = Handy.hands.getLeft()
-	// 	// if(handyLeft) {
-	// 	// 	console.log("left hand event registered")
-	// 	// 	handyLeft.addEventListener("pose changed", (event) => {
-	// 	// 		// console.log(event.message)
-	// 	// 	})
-	// 	// }
-	// } else if (listenPose) {
-	// 	// if(handyLeft.isPose('asl a', 3000)) {
-	// 	// 	handyLeft.traverse((child) => { if(child.material) child.material.color = new Color( "green" ) })
-	// 	// } else {
-	// 	// 	handyLeft.traverse((child) => { if(child.material) child.material.color = new Color("gray") })
-	// 	// }
-	// }
-
-	// RIGHT HAND
-	// if (handyRight == null) {
-	// 	handyRight = Handy.hands.getRight()
-	// 	if (handyRight) {
-	// 		console.log("right hand event registered")
-	// 		handyRight.addEventListener("pose changed", (event) => {
-	// 			console.log(event.message)
-	// 		})
-	// 	}
-	// } else if (listenPose) {
-	// 	if (rightHand.isPose(`asl ${correctAnswer?.toLowerCase()}`, 3000)) {
-	// 		// Get the time away from last frame in threejs
-	// 		userCorrectAnswerInterval += lastTime
-	// 		if (userCorrectAnswerInterval > correctIntervalThreshold) {
-	// 			// user has held the pose for 3 seconds
-	// 			// transition to the next state
-	// 			// Play success audio 
-	// 			listenPose = false
-	// 			userCorrectAnswerInterval = correctIntervalThreshold;
-	// 			anchorText.text = anchorText.text.replace("_", correctAnswer)
-	// 			anchorText.sync()
-	// 			// next question
-	// 			setTimeout(() => {
-	// 				questionIndex += 1
-	// 				setupQuestion(questions[questionIndex])
-	// 			}, 3000);
-	// 		}
-	// 		// if time reached 3 seconds, then user has held the pose for 3 seconds
-	// 	} else {
-	// 		if (userCorrectAnswerInterval > 0) {
-	// 			const newInterval = userCorrectAnswerInterval - (lastTime * incorrectAnswerMultipler)
-	// 			userCorrectAnswerInterval = newInterval > 0 ? newInterval : 0
-	// 		}
-	// 	}
-	// 	// console.log(userCorrectAnswerInterval)
-	// 	handyRight.traverse((child) => { if (child.material) child.material.color = new Color().lerpColors(defaultColor, successColor, userCorrectAnswerInterval / 3000) })
-	// }
-
 	if (gameState == GAME_STATE.ANSWERING) {
 		// here we start listening to the pose
 		listenRightHand(delta);
+	}
+
+	if (hitTestMarkerText != null) {
+		hitTestMarkerText.lookAt(camera.position);
 	}
 
 	Handy.update()
