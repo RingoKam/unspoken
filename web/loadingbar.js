@@ -19,7 +19,6 @@ export default class LoadingBar {
         this.group.add(this.backdropMesh);
         this.indiciatorBarGroup = new Group();
         this.group.add(this.indiciatorBarGroup);
-        const margin = 0.01;
         const indicatorWidth = length / totalCount / 2;
         this.indiciatorBarGroup.position.set(-0.5 + indicatorWidth, 0, 0.005);
 
