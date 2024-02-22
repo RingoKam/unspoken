@@ -71,6 +71,8 @@ const defaultColor = new Color(0x000000)
 let anchorModel, anchorText;
 
 let questions = [];
+let questionModels = {}; // cache the question 3D models
+
 let correctAnswer = null;
 let userCorrectAnswerInterval = 0;
 const correctIntervalThreshold = 1500;
@@ -119,6 +121,7 @@ async function init() {
 	window.addEventListener('resize', onWindowResize);
 	setupReferenceImage(scene);
 	setupRATK();
+	await fetchQuestions();
 
 	// Ghost hand
 	ghostHand = new GhostHand(scene)
@@ -166,9 +169,9 @@ function setupQuestionAnchor(anchor) {
 		rotationMatrix.lookAt(eyePos, anchorPos, new Vector3(0, 1, 0));
 		group.quaternion.setFromRotationMatrix(rotationMatrix);
 		hitTestMarker.parent = null; // detach from the hitTestTarget
-		
+
 		// detach from the hitTestTarget
-		hitTestMarkerText.parent = null; 
+		hitTestMarkerText.parent = null;
 		hitTestTarget.remove(hitTestMarkerText)
 		hitTestMarkerText.dispose();
 		// TODO: animate the hitTestMarker 
@@ -182,6 +185,7 @@ function setupQuestionAnchor(anchor) {
 
 	gameState = GAME_STATE.LOADING;
 
+	//TODO: reference the question json isntead of the model
 	fetch('./question.json')
 		.then(response => response.json())
 		.then(data => {
@@ -197,6 +201,32 @@ function setupQuestionAnchor(anchor) {
 
 			setupQuestion(questions[questionIndex])
 		});
+}
+
+async function fetchQuestions() {
+	try {
+		const response = await fetch('./question.json');
+		const data = await response.json()
+		questions = data;
+
+		const loader = new GLTFLoader();
+
+		// now that the questions are loaded, we can load in the 3D model
+		const modelPromises = questions.map((question) => {
+			return new Promise((resolve, reject) => {
+				loader.load(`./${question.model}`, function (gltf) {
+					resolve({ name: question.model, gltf })
+				}, null, reject);
+			})
+		});
+
+		const models = await Promise.all(modelPromises);
+		models.forEach((model) => {
+			questionModels[model.name] = model.gltf;
+		});
+	} catch (error) {
+		console.error('Error fetching question', error);
+	}
 }
 
 /**
@@ -237,51 +267,51 @@ async function setupQuestion(data) {
 
 	// TODO: instead of loading up the question one by one, 
 	// We should load all the question at once to speed things up?
-	loader.load(`./${data.model}`, function (gltf) {
-		const question = data.word.replace(data.answer, "_")
 
-		ghostHand.hideBoxhandModel();
-		ghostHand.updateBoxHandPose(`asl ${data.answer.toLowerCase()}`);
-		clearTimeoutBoxHand();
-		// show ghost hand after 5 seconds
-		timeoutBoxHandId = setTimeout(() => {
-			ghostHand.showBoxHandModel();
-		}, 5000);
+	const gltf = questionModels[data.model]
+	const question = data.word.replace(data.answer, "_")
 
-		cameraWorldPosition.setFromMatrixPosition(camera.matrixWorld);
-		console.log(cameraWorldPosition)
-		ghostHandModel.position.set(cameraWorldPosition.x + 0.1, cameraWorldPosition.y - 0.1, cameraWorldPosition.z - 0.3)
-		// based on the position of the user camera, set it infront of it
-		correctAnswer = data.answer
-		anchorText.text = question
-		anchorText.sync();
+	ghostHand.hideBoxhandModel();
+	ghostHand.updateBoxHandPose(`asl ${data.answer.toLowerCase()}`);
+	clearTimeoutBoxHand();
+	// show ghost hand after 5 seconds
+	timeoutBoxHandId = setTimeout(() => {
+		ghostHand.showBoxHandModel();
+	}, 5000);
 
-		// remove the model inside anchorModel 
-		const model = gltf.scene;
-		model.scale.set(1, 1, 1)
-		model.frustumCulled = false	// always render
-		model.position.set(0, 0, 0)
+	cameraWorldPosition.setFromMatrixPosition(camera.matrixWorld);
+	console.log(cameraWorldPosition)
+	ghostHandModel.position.set(cameraWorldPosition.x + 0.1, cameraWorldPosition.y - 0.1, cameraWorldPosition.z - 0.3)
+	// based on the position of the user camera, set it infront of it
+	correctAnswer = data.answer
+	anchorText.text = question
+	anchorText.sync();
 
-		const aabb = new Box3();
-		aabb.setFromObject(model);
+	// remove the model inside anchorModel 
+	const model = gltf.scene;
+	model.scale.set(1, 1, 1)
+	model.frustumCulled = false	// always render
+	model.position.set(0, 0, 0)
 
-		// from the box3, get the height of the model and scale it to 1
-		console.log(aabb.max.y)
-		const scale = 0.60 / aabb.max.y
-		console.log(scale)
-		model.scale.set(scale, scale, scale)
+	const aabb = new Box3();
+	aabb.setFromObject(model);
 
-		const height = (aabb.max.y - aabb.min.y) * scale / 2;
-		model.position.y = height;
+	// from the box3, get the height of the model and scale it to 1
+	console.log(aabb.max.y)
+	const scale = 0.60 / aabb.max.y
+	console.log(scale)
+	model.scale.set(scale, scale, scale)
 
-		anchorText.position.set(0, (aabb.max.y - aabb.min.y) * scale, -1)
+	const height = (aabb.max.y - aabb.min.y) * scale / 2;
+	model.position.y = height;
 
-		anchorModel.add(model);
-		animateIn(anchorModel).then(() => {
-			listenPose = true
-			gameState = GAME_STATE.ANSWERING;
-		})
-	});
+	anchorText.position.set(0, (aabb.max.y - aabb.min.y) * scale, -1)
+
+	anchorModel.add(model);
+	animateIn(anchorModel).then(() => {
+		listenPose = true
+		gameState = GAME_STATE.ANSWERING;
+	})
 
 	// console.log("anchor is loaded!")
 	// console.log(anchorModel)
@@ -442,7 +472,7 @@ function handleControllerConnected(event) {
 			hitTestMarkerText.frustumCulled = false	// always render
 			hitTestMarkerText.anchorX = 'center';
 			hitTestMarkerText.anchorY = 'bottom';
-			hitTestMarkerText.fontSize = 0.1	
+			hitTestMarkerText.fontSize = 0.1
 			this.hitTestTarget.add(hitTestMarkerText);
 			hitTestMarkerText.position.set(0, 0.2, 0);
 
