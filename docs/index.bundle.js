@@ -1922,6 +1922,70 @@ console.log( '\n\n👋 Handy (rev '+ Handy.REVISION +')\n\n\n' )
 
 /***/ }),
 
+/***/ "./loadingbar.js":
+/*!***********************!*\
+  !*** ./loadingbar.js ***!
+  \***********************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ LoadingBar)
+/* harmony export */ });
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+
+
+const backgroundColor = "#3e3e3e";
+const solidColor = "#ffffff";
+
+class LoadingBar {
+    
+    constructor(scene) {
+        this.scene = scene;
+    }
+
+    SetupLoadingBar(totalCount) {
+        this.group = new three__WEBPACK_IMPORTED_MODULE_0__.Group();
+        const length = 1;
+        const geometry = new three__WEBPACK_IMPORTED_MODULE_0__.BoxGeometry(length, 0.1, 0.005);
+        const material = new three__WEBPACK_IMPORTED_MODULE_0__.MeshBasicMaterial({color: backgroundColor});
+        this.backdropMesh = new three__WEBPACK_IMPORTED_MODULE_0__.Mesh(geometry, material);
+
+        this.group.add(this.backdropMesh);
+        this.indiciatorBarGroup = new three__WEBPACK_IMPORTED_MODULE_0__.Group();
+        this.group.add(this.indiciatorBarGroup);
+        const indicatorWidth = length / totalCount / 2;
+        this.indiciatorBarGroup.position.set(-0.5 + indicatorWidth, 0, 0.005);
+
+        // create actual counter
+        const tickMaterial = new three__WEBPACK_IMPORTED_MODULE_0__.MeshBasicMaterial({color: solidColor});
+        for(var i = 0; i < totalCount; i++) {
+            const geometry = new three__WEBPACK_IMPORTED_MODULE_0__.BoxGeometry(indicatorWidth, 0.05, 0.001);
+            const mesh = new three__WEBPACK_IMPORTED_MODULE_0__.Mesh(geometry, tickMaterial);
+            this.indiciatorBarGroup.add(mesh);
+            mesh.position.set((indicatorWidth + indicatorWidth) * i, 0, -0.005);
+        }
+
+        this.scene.add(this.group);
+
+        return this.group;
+    }
+
+    UpdateLoadingBar(currentCount) {
+        // loop thru the indicator bar group
+        for(var i = 0; i < this.indiciatorBarGroup.children.length; i++) {
+            const mesh = this.indiciatorBarGroup.children[i];
+            if (i < currentCount) {
+                this.indiciatorBarGroup.children[i].position.z = 0;
+            } else {
+                this.indiciatorBarGroup.children[i].position.z = -0.005;
+            }
+        }
+    }
+}
+
+/***/ }),
+
 /***/ "./node_modules/ratk/lib/Anchor.js":
 /*!*****************************************!*\
   !*** ./node_modules/ratk/lib/Anchor.js ***!
@@ -70481,16 +70545,17 @@ var __webpack_exports__ = {};
   \******************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ratk__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ratk */ "./node_modules/ratk/lib/index.js");
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
 /* harmony import */ var _tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tweenjs/tween.js */ "./node_modules/@tweenjs/tween.js/dist/tween.esm.js");
 /* harmony import */ var _handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./handy/src/Handy.js */ "./handy/src/Handy.js");
-/* harmony import */ var troika_three_text__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! troika-three-text */ "./node_modules/troika-three-text/dist/troika-three-text.esm.js");
-/* harmony import */ var three_examples_jsm_webxr_XRHandModelFactory_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! three/examples/jsm/webxr/XRHandModelFactory.js */ "./node_modules/three/examples/jsm/webxr/XRHandModelFactory.js");
-/* harmony import */ var three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! three/addons/loaders/GLTFLoader.js */ "./node_modules/three/examples/jsm/loaders/GLTFLoader.js");
-/* harmony import */ var three_addons_loaders_DRACOLoader_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! three/addons/loaders/DRACOLoader.js */ "./node_modules/three/examples/jsm/loaders/DRACOLoader.js");
+/* harmony import */ var troika_three_text__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! troika-three-text */ "./node_modules/troika-three-text/dist/troika-three-text.esm.js");
+/* harmony import */ var three_examples_jsm_webxr_XRHandModelFactory_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! three/examples/jsm/webxr/XRHandModelFactory.js */ "./node_modules/three/examples/jsm/webxr/XRHandModelFactory.js");
+/* harmony import */ var three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! three/addons/loaders/GLTFLoader.js */ "./node_modules/three/examples/jsm/loaders/GLTFLoader.js");
+/* harmony import */ var three_addons_loaders_DRACOLoader_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! three/addons/loaders/DRACOLoader.js */ "./node_modules/three/examples/jsm/loaders/DRACOLoader.js");
 /* harmony import */ var _soundEffects_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./soundEffects.js */ "./soundEffects.js");
 /* harmony import */ var _assets_referenceImage_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./assets/referenceImage.js */ "./assets/referenceImage.js");
 /* harmony import */ var _ghost_hand_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ghost-hand.js */ "./ghost-hand.js");
+/* harmony import */ var _loadingbar_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./loadingbar.js */ "./loadingbar.js");
 
 
 
@@ -70513,63 +70578,72 @@ const GAME_STATE = {
 }
 let gameState = GAME_STATE.START;
 
+const optionalFeatures = [
+	'anchors',
+	'plane-detection',
+	'mesh-detection',
+	'hit-test',
+	'local-floor'
+]
+
+let isAR = false;
+let isVR = false;
+
 // Global variables for scene components
 let camera, scene, renderer;
-let cameraWorldPosition = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3();
-let controller1, controller2;
+let cameraWorldPosition = new three__WEBPACK_IMPORTED_MODULE_7__.Vector3();
 let leftHand, rightHand;
-let controllerGrip1, controllerGrip2;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
 let handyLeft, handyRight;
-const groupList = []
 let anchorCreated = false
 let ghostHand = null;
 let ghostHandModel = null;
 let timeoutBoxHandId = null; // timeout for box hand
+let loadingBar = null;
+let questionIndex = 0;
+let hitTestTarget = null;
+let hitTestMarker = null;
+let hitTestMarkerText = null;
+let listenPose = false;
 
-
-const successColor = new three__WEBPACK_IMPORTED_MODULE_6__.Color(0x66941B)
-const defaultColor = new three__WEBPACK_IMPORTED_MODULE_6__.Color(0x000000)
+const successColor = new three__WEBPACK_IMPORTED_MODULE_7__.Color(0x66941B)
+const defaultColor = new three__WEBPACK_IMPORTED_MODULE_7__.Color(0x000000)
 
 // anchor model for the scene
 let anchorModel, anchorText;
 
 let questions = [];
+let questionModels = {}; // cache the question 3D models
+
 let correctAnswer = null;
 let userCorrectAnswerInterval = 0;
 const correctIntervalThreshold = 1500;
 const incorrectAnswerMultipler = 1.5;
 
-const loader = new three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_7__.GLTFLoader();
-const dracoLoader = new three_addons_loaders_DRACOLoader_js__WEBPACK_IMPORTED_MODULE_8__.DRACOLoader();
+const loader = new three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_8__.GLTFLoader();
+const dracoLoader = new three_addons_loaders_DRACOLoader_js__WEBPACK_IMPORTED_MODULE_9__.DRACOLoader();
 dracoLoader.setDecoderPath('/examples/jsm/libs/draco/');
 loader.setDRACOLoader(dracoLoader);
 
-const handModels = {
-	left: null,
-	right: null
-};
-
-let listenPose = false
-
 // Initialize and animate the scene
-init().then(() => {
-	animate();
-
-	// just for testing purpose, lets listen for space key
-	window.addEventListener('keydown', (event) => {
-		if (event.code == "Space" && window._debug) {
-			if (questionIndex >= questions.length - 1) {
-				(0,_soundEffects_js__WEBPACK_IMPORTED_MODULE_3__.playGameOver)();
-				endGame();
-			} else {
-				(0,_soundEffects_js__WEBPACK_IMPORTED_MODULE_3__.playCorrect)();
-				nextQuestion();
+window.startGame = () => {
+	init().then(() => {
+		animate();
+		// just for testing purpose, lets listen for space key
+		window.addEventListener('keydown', (event) => {
+			if (event.code == "Space" && window._debug) {
+				if (questionIndex >= questions.length - 1) {
+					(0,_soundEffects_js__WEBPACK_IMPORTED_MODULE_3__.playGameOver)();
+					endGame();
+				} else {
+					(0,_soundEffects_js__WEBPACK_IMPORTED_MODULE_3__.playCorrect)();
+					nextQuestion();
+				}
 			}
-		}
+		});
 	});
-});
+}
 
 /**
  * Initializes the scene, camera, renderer, lighting, and AR functionalities.
@@ -70577,22 +70651,25 @@ init().then(() => {
 async function init() {
 	gameState = GAME_STATE.START;
 
-	scene = new three__WEBPACK_IMPORTED_MODULE_6__.Scene();
+	scene = new three__WEBPACK_IMPORTED_MODULE_7__.Scene();
 	setupCamera();
 	setupLighting();
 	setupRenderer();
 	setupARButton();
+	// setupVRButton();
+	// We need to setup VR/AR mode first, once thats decided
+	// then we can setup the controller and the rest of the scene
 	setupController();
-	setupHandy();
 	await (0,_soundEffects_js__WEBPACK_IMPORTED_MODULE_3__.setupSfx)(camera);
 	window.addEventListener('resize', onWindowResize);
 	(0,_assets_referenceImage_js__WEBPACK_IMPORTED_MODULE_4__.setupReferenceImage)(scene);
 	setupRATK();
+	await fetchQuestions();
 
 	// Ghost hand
 	ghostHand = new _ghost_hand_js__WEBPACK_IMPORTED_MODULE_5__["default"](scene)
 	ghostHand.loadBoxHandModel('right').then((handModel) => {
-		handModel.scale.set(1,1,1);
+		handModel.scale.set(1, 1, 1);
 		handModel.position.set(0, 0.75, -1);
 		// We need rotate the hand based on the character
 		handModel.rotateX(Math.PI / 2);
@@ -70610,38 +70687,96 @@ async function init() {
 	});
 }
 
-let questionIndex = 0;
 
 // Set up the anchor
 function setupQuestionAnchor(anchor) {
 
 	console.log("anchor is being loaded...")
 
-	const group = new three__WEBPACK_IMPORTED_MODULE_6__.Group();
-	anchorModel = new three__WEBPACK_IMPORTED_MODULE_6__.Group();
-	anchorText = new troika_three_text__WEBPACK_IMPORTED_MODULE_9__.Text();
+	const group = new three__WEBPACK_IMPORTED_MODULE_7__.Group();
+	anchorModel = new three__WEBPACK_IMPORTED_MODULE_7__.Group();
+	anchorText = new troika_three_text__WEBPACK_IMPORTED_MODULE_10__.Text();
 
 	group.add(anchorText);
 	group.add(anchorModel);
-	group.position.set(0, 0, -2);
+
+	if (anchor !== null) {
+		// ensure the group is facing toward camera global position
+		group.position.set(anchor.position.x, anchor.position.y, anchor.position.z);
+		// calculate rotation toward user camera
+		const rotationMatrix = new three__WEBPACK_IMPORTED_MODULE_7__.Matrix4();
+		const eyePos = camera.position.clone();
+		eyePos.y = 0;
+		const anchorPos = anchor.position.clone();
+		anchorPos.y = 0;
+		rotationMatrix.lookAt(eyePos, anchorPos, new three__WEBPACK_IMPORTED_MODULE_7__.Vector3(0, 1, 0));
+		group.quaternion.setFromRotationMatrix(rotationMatrix);
+		hitTestMarker.parent = null; // detach from the hitTestTarget
+
+		// detach from the hitTestTarget
+		hitTestMarkerText.parent = null;
+		hitTestTarget.remove(hitTestMarkerText)
+		hitTestMarkerText.dispose();
+		// TODO: animate the hitTestMarker 
+
+
+	} else {
+		group.position.set(0, 0, -2.5);
+	}
+
 	scene.add(group);
 
 	gameState = GAME_STATE.LOADING;
 
+	//TODO: reference the question json isntead of the model
 	fetch('./question.json')
 		.then(response => response.json())
 		.then(data => {
 			// setupGroups(anchor)
 			questions = data
-			setupQuestion(questions[0])
+
+			// setup loading bar
+			loadingBar = new _loadingbar_js__WEBPACK_IMPORTED_MODULE_6__["default"](scene)
+			var bar = loadingBar.SetupLoadingBar(questions.length)
+			group.add(bar)
+			bar.position.set(0, 0, 0.4)
+			loadingBar.UpdateLoadingBar(questionIndex + 1)
+
+			setupQuestion(questions[questionIndex])
 		});
+}
+
+async function fetchQuestions() {
+	try {
+		const response = await fetch('./question.json');
+		const data = await response.json()
+		questions = data;
+
+		const loader = new three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_8__.GLTFLoader();
+
+		// now that the questions are loaded, we can load in the 3D model
+		const modelPromises = questions.map((question) => {
+			return new Promise((resolve, reject) => {
+				loader.load(`./${question.model}`, function (gltf) {
+					resolve({ name: question.model, gltf })
+				}, null, reject);
+			})
+		});
+
+		const models = await Promise.all(modelPromises);
+		models.forEach((model) => {
+			questionModels[model.name] = model.gltf;
+		});
+	} catch (error) {
+		console.error('Error fetching question', error);
+	}
 }
 
 /**
  * Sets up the camera for the scene.
  */
 function setupCamera() {
-	camera = new three__WEBPACK_IMPORTED_MODULE_6__.PerspectiveCamera(
+	camera = new three__WEBPACK_IMPORTED_MODULE_7__.PerspectiveCamera(
 		50,
 		window.innerWidth / window.innerHeight,
 		0.1,
@@ -70650,7 +70785,7 @@ function setupCamera() {
 	// Hack for Handy
 	window.camera = camera;
 	camera.position.set(0, 1.6, 3);
-	camera.lookAt(new three__WEBPACK_IMPORTED_MODULE_6__.Vector3(0, 0, 0))
+	camera.lookAt(new three__WEBPACK_IMPORTED_MODULE_7__.Vector3(0, 0, 0))
 }
 
 async function setupQuestion(data) {
@@ -70662,7 +70797,7 @@ async function setupQuestion(data) {
 	anchorText.anchorY = 'bottom';
 	anchorText.fontSize = 1
 
-	const loader = new three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_7__.GLTFLoader();
+	const loader = new three_addons_loaders_GLTFLoader_js__WEBPACK_IMPORTED_MODULE_8__.GLTFLoader();
 	console.log("loading...", data.model)
 	gameState = GAME_STATE.LOADING;
 	if (anchorModel.children.length > 0) {
@@ -70672,55 +70807,54 @@ async function setupQuestion(data) {
 		anchorText.text = "Loading..."
 		anchorText.sync()
 	}
+
 	// TODO: instead of loading up the question one by one, 
 	// We should load all the question at once to speed things up?
-	loader.load(`./${data.model}`, function (gltf) {
-		const question = data.word.replace(data.answer, "_")
 
-		ghostHand.hideBoxhandModel();
-		ghostHand.updateBoxHandPose(`asl ${data.answer.toLowerCase()}`);
-		clearTimeoutBoxHand();
-		// show ghost hand after 5 seconds
-		timeoutBoxHandId = setTimeout(() => {
-			ghostHand.showBoxHandModel();
-		}, 5000);
+	const gltf = questionModels[data.model]
+	const question = data.word.replace(data.answer, "_")
 
-		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
-		console.log(cameraWorldPosition)
-		ghostHandModel.position.set(cameraWorldPosition.x + 0.1, cameraWorldPosition.y - 0.1, cameraWorldPosition.z - 0.3)
-		// based on the position of the user camera, set it infront of it
+	ghostHand.hideBoxhandModel();
+	ghostHand.updateBoxHandPose(`asl ${data.answer.toLowerCase()}`);
+	clearTimeoutBoxHand();
+	// show ghost hand after 5 seconds
+	timeoutBoxHandId = setTimeout(() => {
+		ghostHand.showBoxHandModel();
+	}, 5000);
 
+	cameraWorldPosition.setFromMatrixPosition(camera.matrixWorld);
+	console.log(cameraWorldPosition)
+	ghostHandModel.position.set(cameraWorldPosition.x + 0.1, cameraWorldPosition.y - 0.1, cameraWorldPosition.z - 0.3)
+	// based on the position of the user camera, set it infront of it
+	correctAnswer = data.answer
+	anchorText.text = question
+	anchorText.sync();
 
-		correctAnswer = data.answer
-		anchorText.text = question
-		anchorText.sync();
+	// remove the model inside anchorModel 
+	const model = gltf.scene;
+	model.scale.set(1, 1, 1)
+	model.frustumCulled = false	// always render
+	model.position.set(0, 0, 0)
 
-		// remove the model inside anchorModel 
-		const model = gltf.scene;
-		model.scale.set(1, 1, 1)
-		model.frustumCulled = false	// always render
-		model.position.set(0, 0, 0)
+	const aabb = new three__WEBPACK_IMPORTED_MODULE_7__.Box3();
+	aabb.setFromObject(model);
 
-		const aabb = new three__WEBPACK_IMPORTED_MODULE_6__.Box3();
-		aabb.setFromObject(model);
+	// from the box3, get the height of the model and scale it to 1
+	console.log(aabb.max.y)
+	const scale = 0.60 / aabb.max.y
+	console.log(scale)
+	model.scale.set(scale, scale, scale)
 
-		// from the box3, get the height of the model and scale it to 1
-		console.log(aabb.max.y)
-		const scale = 0.60 / aabb.max.y
-		console.log(scale)
-		model.scale.set(scale, scale, scale)
+	const height = (aabb.max.y - aabb.min.y) * scale / 2;
+	model.position.y = height;
 
-		const height = (aabb.max.y - aabb.min.y) * scale / 2;
-		model.position.y = height;
+	anchorText.position.set(0, (aabb.max.y - aabb.min.y) * scale, -1)
 
-		anchorText.position.set(0, (aabb.max.y - aabb.min.y) * scale, -1)
-
-		anchorModel.add(model);
-		animateIn(anchorModel).then(() => {
-			listenPose = true
-			gameState = GAME_STATE.ANSWERING;
-		})
-	});
+	anchorModel.add(model);
+	animateIn(anchorModel).then(() => {
+		listenPose = true
+		gameState = GAME_STATE.ANSWERING;
+	})
 
 	// console.log("anchor is loaded!")
 	// console.log(anchorModel)
@@ -70734,8 +70868,8 @@ async function setupQuestion(data) {
  * Sets up the lighting for the scene.
  */
 function setupLighting() {
-	scene.add(new three__WEBPACK_IMPORTED_MODULE_6__.HemisphereLight(0x606060, 0x404040));
-	const light = new three__WEBPACK_IMPORTED_MODULE_6__.DirectionalLight(0xffffff);
+	scene.add(new three__WEBPACK_IMPORTED_MODULE_7__.HemisphereLight(0x606060, 0x404040));
+	const light = new three__WEBPACK_IMPORTED_MODULE_7__.DirectionalLight(0xffffff);
 	light.position.set(1, 1, 1).normalize();
 	scene.add(light);
 }
@@ -70744,7 +70878,7 @@ function setupLighting() {
  * Sets up the renderer for the scene.
  */
 function setupRenderer() {
-	renderer = new three__WEBPACK_IMPORTED_MODULE_6__.WebGLRenderer({
+	renderer = new three__WEBPACK_IMPORTED_MODULE_7__.WebGLRenderer({
 		alpha: true,
 		antialias: true,
 		multiviewStereo: true,
@@ -70760,6 +70894,39 @@ function setupRenderer() {
  */
 function setupARButton() {
 	const arButton = document.getElementById('ar-button');
+	isAR = true;
+	// display the AR button
+	arButton.style.display = 'block';
+	ratk__WEBPACK_IMPORTED_MODULE_0__.ARButton.convertToARButton(arButton, renderer, {
+		requiredFeatures: [
+			'hand-tracking',
+			...optionalFeatures
+		],
+		onUnsupported: () => {
+			isAR = false;
+			arButton.style.display = 'none';
+			setupVRButton();
+		}
+	});
+}
+
+function setupVRButton() {
+	const vrButton = document.getElementById('vr-button');
+	vrButton.style.display = 'block';
+	isVR = true;
+	ratk__WEBPACK_IMPORTED_MODULE_0__.VRButton.convertToVRButton(vrButton, renderer, {
+		requiredFeatures: [
+			'hand-tracking',
+		],
+		onUnsupported: () => {
+			isVR = false;
+			vrButton.style.display = 'none';
+			setupWebLaunchButton();
+		}
+	});
+}
+
+function setupWebLaunchButton() {
 	const webLaunchButton = document.getElementById('web-launch-button');
 	webLaunchButton.onclick = () => {
 		window.open(
@@ -70767,140 +70934,91 @@ function setupARButton() {
 			encodeURIComponent(window.location.href),
 		);
 	};
-
-	ratk__WEBPACK_IMPORTED_MODULE_0__.ARButton.convertToARButton(arButton, renderer, {
-		requiredFeatures: [
-			'anchors',
-			'plane-detection',
-			'hit-test',
-			'mesh-detection',
-			'hand-tracking',
-			'local-floor',
-			'hand-tracking'
-		],
-		onUnsupported: () => {
-			arButton.style.display = 'none';
-			webLaunchButton.style.display = 'block';
-		},
-	});
+	webLaunchButton.style.display = 'block';
 }
 
 /**
  * Sets up the XR controller and its event listeners.
  */
 function setupController() {
-	controller1 = renderer.xr.getController(0);
-	scene.add(controller1);
-
-	controller2 = renderer.xr.getController(1);
-	scene.add(controller2);
-
-	// const controllerModelFactory = new XRControllerModelFactory();
-	const handModelFactory = new three_examples_jsm_webxr_XRHandModelFactory_js__WEBPACK_IMPORTED_MODULE_10__.XRHandModelFactory();
-
-	// Hand 1
-	controllerGrip1 = renderer.xr.getControllerGrip(0);
-	// controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1));
-	scene.add(controllerGrip1);
-
-	leftHand = renderer.xr.getHand(0);
-	leftHand.userData.currentHandModel = 0;
-
-	scene.add(leftHand);
-
-	handModels.left = handModelFactory.createHandModel(leftHand, 'mesh')
-	handModels.left.visible = true;
-	leftHand.add(handModels.left);
-
-	// console.log(hand1);
-
-	leftHand.addEventListener('pinchend', function () {
-		if (anchorCreated == false) {
-			pendingAnchorData = {
-				position: leftHand.position.clone(),
-				quaternion: leftHand.quaternion.clone(),
-			};
-			anchorCreated = true;
-		}
-	});
-
-	// Hand 2
-
-	controllerGrip2 = renderer.xr.getControllerGrip(1);
-	// controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2));
-	scene.add(controllerGrip2);
-
-	rightHand = renderer.xr.getHand(1);
-	rightHand.userData.currentHandModel = 0;
-	scene.add(rightHand);
-
-	handModels.right = [
-		handModelFactory.createHandModel(rightHand, 'mesh'),
-		handModelFactory.createHandModel(rightHand, 'spheres'),
-		handModelFactory.createHandModel(rightHand, 'boxes')
-	];
-
-	for (let i = 0; i < 3; i++) {
-		const model = handModels.right[i];
-		model.visible = i == 0;
-		rightHand.add(model);
-	}
-
-	rightHand.addEventListener('pinchend', function () {
-		if (anchorCreated == false) {
-			pendingAnchorData = {
-				position: leftHand.position.clone(),
-				quaternion: leftHand.quaternion.clone(),
-			};
-			anchorCreated = true;
-		}
-	});
+	const hand0 = renderer.xr.getHand(0);
+	const hand1 = renderer.xr.getHand(1);
+	[hand0, hand1].forEach(hand => setupHand(hand));
 }
 
-function setupHandy() {
-	// once we make handy
-	_handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__.Handy.makeHandy(leftHand)
-	_handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__.Handy.makeHandy(rightHand)
+function setupHand(hand) {
+	const handModelFactory = new three_examples_jsm_webxr_XRHandModelFactory_js__WEBPACK_IMPORTED_MODULE_11__.XRHandModelFactory();
+	hand.userData.currentHandModel = 0;
+	const model = handModelFactory.createHandModel(hand, 'mesh');
+	model.visible = true;
+	hand.add(model);
+	scene.add(hand);
 
-	
-	// if (handyLeft == null) {
-	// 	handyLeft = Handy.hands.getLeft()
-	// 	// if (handyLeft) {
-	// 	// 	console.log("found left!")
-	// 	// 	handyLeft.addEventListener("pose changed", (event) => {
-	// 	// 		// console.log(event.message)
-	// 	// 	})
-	// 	// }
-	// }
-	if (handyRight == null) {
-		handyRight = _handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__.Handy.hands.getRight()
-		// if (handyRight) {
-		// 	console.log("found right!")
-		// 	handyRight.addEventListener("pose changed", (event) => {
-		// 		// console.log(event.message)
-		// 	})
-		// }
-	}
+	hand.addEventListener('connected', function (event) {
+		// determine if it is left or right hand
+		const handedness = event.data.handedness
+		if (handedness == "left") {
+			leftHand = hand;
+			_handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__.Handy.makeHandy(leftHand)
+		} else if (handedness == "right") {
+			rightHand = hand;
+			_handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__.Handy.makeHandy(rightHand)
+			if (isAR) {
+				handleControllerConnected.apply(this, [event]);
+				rightHand.addEventListener('disconnected', handleControllerDisconnected);
+				rightHand.addEventListener('pinchend', function () {
+					ratk.anchors.forEach((anchor) => {
+						console.log(anchor.anchorID);
+						ratk.deleteAnchor(anchor);
+					});
 
-	// if (handyLeft == null) {
-	// 	handyLeft = Handy.hands.getLeft()
-	// }
+					if (anchorCreated == false) {
+						console.log("pinch end")
+						if (hitTestTarget == null) {
+							console.warn("hit test target is null? how come");
+							return;
+						}
+
+						pendingAnchorData = {
+							position: hitTestTarget.position.clone(),
+							quaternion: hitTestTarget.quaternion.clone(),
+						};
+						anchorCreated = true;
+					}
+				});
+			}
+		}
+	});
 }
 
 /**
  * Handles controller connection events.
  */
 function handleControllerConnected(event) {
+	// start raycasting from hand
 	ratk
 		.createHitTestTargetFromControllerSpace(event.data.handedness)
-		.then((hitTestTarget) => {
-			this.hitTestTarget = hitTestTarget;
-			const geometry = new three__WEBPACK_IMPORTED_MODULE_6__.SphereGeometry(0.05);
-			const material = new three__WEBPACK_IMPORTED_MODULE_6__.MeshBasicMaterial({
+		.then((testTarget) => {
+			this.hitTestTarget = testTarget;
+			const geometry = new three__WEBPACK_IMPORTED_MODULE_7__.CylinderGeometry(0.2, 0.2, 0.01, 32);
+			const material = new three__WEBPACK_IMPORTED_MODULE_7__.MeshBasicMaterial({
 				transparent: true,
 				opacity: 0.5,
 			});
-			const hitTestMarker = new three__WEBPACK_IMPORTED_MODULE_6__.Mesh(geometry, material);
+
+			// Get a reference to the hit target outside of the scope of this function
+			hitTestMarker = new three__WEBPACK_IMPORTED_MODULE_7__.Mesh(geometry, material);
+			hitTestTarget = this.hitTestTarget;
+
+			hitTestMarkerText = new troika_three_text__WEBPACK_IMPORTED_MODULE_10__.Text();
+			hitTestMarkerText.text = "Pinch Right Hand to start";
+			hitTestMarkerText.frustumCulled = false	// always render
+			hitTestMarkerText.anchorX = 'center';
+			hitTestMarkerText.anchorY = 'bottom';
+			hitTestMarkerText.fontSize = 0.1
+			this.hitTestTarget.add(hitTestMarkerText);
+			hitTestMarkerText.position.set(0, 0.2, 0);
+
 			this.hitTestTarget.add(hitTestMarker);
 		});
 }
@@ -70944,32 +71062,35 @@ function setupRATK() {
 	ratk.onMeshAdded = handleMeshAdded;
 	scene.add(ratk.root);
 	renderer.xr.addEventListener('sessionstart', () => {
-		setTimeout(() => {
-			ratk.restorePersistentAnchors().then(() => {
-				ratk.anchors.forEach((anchor) => {
-					console.log(anchor.anchorID);
-					ratk.deleteAnchor(anchor);
+
+		//TODO: Here we need to know if the user is in AR or VR
+		// if in AR, then we need to allow user to specify the anchor
+		if (isAR) {
+			setTimeout(() => {
+				ratk.restorePersistentAnchors().then(() => {
+					ratk.anchors.forEach((anchor) => {
+						buildAnchorMarker(anchor, true);
+					});
 				});
-				// if (ratk.anchors.length > 0) {
-				// 	anchorCreated = true;
-				// 	setupAnchor(ratk.anchors[0]);
-				// }
-			});
-		}, 1000);
-		setTimeout(() => {
-			if (ratk.planes.size == 0) {
-				renderer.xr.getSession().initiateRoomCapture();
-			}
-		}, 5000);
+			}, 1000);
+			setTimeout(() => {
+				if (ratk.planes.size == 0) {
+					renderer.xr.getSession().initiateRoomCapture();
+				}
+			}, 5000);
+		} else if (isVR) {
+			// else in VR, we can just load the model infront of the user
+			setupQuestionAnchor(null)
+		}
 	});
-}
+};
 
 /**
  * Handles the addition of a new plane detected by RATK.
  */
 function handlePlaneAdded(plane) {
 	const mesh = plane.planeMesh;
-	mesh.material = new three__WEBPACK_IMPORTED_MODULE_6__.MeshBasicMaterial({
+	mesh.material = new three__WEBPACK_IMPORTED_MODULE_7__.MeshBasicMaterial({
 		wireframe: true,
 		color: Math.random() * 0xffffff,
 	});
@@ -70981,22 +71102,14 @@ function handlePlaneAdded(plane) {
  */
 function handleMeshAdded(mesh) {
 	const meshMesh = mesh.meshMesh;
-	meshMesh.material = new three__WEBPACK_IMPORTED_MODULE_6__.MeshBasicMaterial({
+	meshMesh.material = new three__WEBPACK_IMPORTED_MODULE_7__.MeshBasicMaterial({
 		wireframe: true,
 		color: Math.random() * 0xffffff,
 	});
 	meshMesh.geometry.computeBoundingBox();
-	const semanticLabel = new troika_three_text__WEBPACK_IMPORTED_MODULE_9__.Text();
+	const semanticLabel = new troika_three_text__WEBPACK_IMPORTED_MODULE_10__.Text();
 	meshMesh.add(semanticLabel);
 	meshMesh.visible = false;
-	// semanticLabel.text = mesh.semanticLabel;
-	// semanticLabel.anchorX = 'center';
-	// semanticLabel.anchorY = 'bottom';
-	// semanticLabel.fontSize = 0.1;
-	// semanticLabel.color = 0x000000;
-	// semanticLabel.sync();
-	// semanticLabel.position.y = meshMesh.geometry.boundingBox.max.y;
-	// mesh.userData.semanticLabelMesh = semanticLabel;
 }
 
 /**
@@ -71029,67 +71142,13 @@ function render(arg) {
 	updateSemanticLabels();
 	const session = renderer.xr.getSession();
 
-	// TODO: there are some logic here that we use to setup the hands
-	// maybe we can move this to a separate function
-	// Let's disable left hand input for now
-	// LEFT HAND
-	// if (handyLeft == null) {
-	// 	handyLeft = Handy.hands.getLeft()
-	// 	// if(handyLeft) {
-	// 	// 	console.log("left hand event registered")
-	// 	// 	handyLeft.addEventListener("pose changed", (event) => {
-	// 	// 		// console.log(event.message)
-	// 	// 	})
-	// 	// }
-	// } else if (listenPose) {
-	// 	// if(handyLeft.isPose('asl a', 3000)) {
-	// 	// 	handyLeft.traverse((child) => { if(child.material) child.material.color = new Color( "green" ) })
-	// 	// } else {
-	// 	// 	handyLeft.traverse((child) => { if(child.material) child.material.color = new Color("gray") })
-	// 	// }
-	// }
-
-	// RIGHT HAND
-	// if (handyRight == null) {
-	// 	handyRight = Handy.hands.getRight()
-	// 	if (handyRight) {
-	// 		console.log("right hand event registered")
-	// 		handyRight.addEventListener("pose changed", (event) => {
-	// 			console.log(event.message)
-	// 		})
-	// 	}
-	// } else if (listenPose) {
-	// 	if (rightHand.isPose(`asl ${correctAnswer?.toLowerCase()}`, 3000)) {
-	// 		// Get the time away from last frame in threejs
-	// 		userCorrectAnswerInterval += lastTime
-	// 		if (userCorrectAnswerInterval > correctIntervalThreshold) {
-	// 			// user has held the pose for 3 seconds
-	// 			// transition to the next state
-	// 			// Play success audio 
-	// 			listenPose = false
-	// 			userCorrectAnswerInterval = correctIntervalThreshold;
-	// 			anchorText.text = anchorText.text.replace("_", correctAnswer)
-	// 			anchorText.sync()
-	// 			// next question
-	// 			setTimeout(() => {
-	// 				questionIndex += 1
-	// 				setupQuestion(questions[questionIndex])
-	// 			}, 3000);
-	// 		}
-	// 		// if time reached 3 seconds, then user has held the pose for 3 seconds
-	// 	} else {
-	// 		if (userCorrectAnswerInterval > 0) {
-	// 			const newInterval = userCorrectAnswerInterval - (lastTime * incorrectAnswerMultipler)
-	// 			userCorrectAnswerInterval = newInterval > 0 ? newInterval : 0
-	// 		}
-	// 	}
-	// 	// console.log(userCorrectAnswerInterval)
-	// 	handyRight.traverse((child) => { if (child.material) child.material.color = new Color().lerpColors(defaultColor, successColor, userCorrectAnswerInterval / 3000) })
-	// }
-
 	if (gameState == GAME_STATE.ANSWERING) {
 		// here we start listening to the pose
 		listenRightHand(delta);
+	}
+
+	if (hitTestMarkerText != null) {
+		hitTestMarkerText.lookAt(camera.position);
 	}
 
 	_handy_src_Handy_js__WEBPACK_IMPORTED_MODULE_2__.Handy.update()
@@ -71125,14 +71184,14 @@ function listenRightHand(delta) {
 				userCorrectAnswerInterval = newInterval > 0 ? newInterval : 0;
 			}
 		}
-		handyRight?.traverse((child) => { if (child.material) child.material.color = new three__WEBPACK_IMPORTED_MODULE_6__.Color().lerpColors(defaultColor, successColor, userCorrectAnswerInterval / correctIntervalThreshold); });
+		handyRight?.traverse((child) => { if (child.material) child.material.color = new three__WEBPACK_IMPORTED_MODULE_7__.Color().lerpColors(defaultColor, successColor, userCorrectAnswerInterval / correctIntervalThreshold); });
 	} else {
 		console.warn("Handy Right is not setup")
 	}
 }
 
 function clearTimeoutBoxHand() {
-	if(timeoutBoxHandId !== null) {
+	if (timeoutBoxHandId !== null) {
 		clearTimeout(timeoutBoxHandId);
 		timeoutBoxHandId = null;
 	}
@@ -71145,7 +71204,7 @@ function endGame() {
 		anchorModel.remove(anchorModel.children[0])
 		anchorText.text = "Thanks for Playing";
 		anchorText.sync();
-	})	
+	})
 }
 
 function nextQuestion() {
@@ -71159,6 +71218,7 @@ function nextQuestion() {
 	// next question
 	setTimeout(() => {
 		questionIndex += 1;
+		loadingBar.UpdateLoadingBar(questionIndex + 1)
 		setupQuestion(questions[questionIndex]);
 	}, 1000);
 }
@@ -71184,11 +71244,11 @@ function handlePendingAnchors() {
 // This is from the sample project, where an anchor is created 
 // when the user pinches the controller
 function buildAnchorMarker(anchor, isRecovered) {
-	const geometry = new three__WEBPACK_IMPORTED_MODULE_6__.BoxGeometry(0.05, 0.05, 0.05);
-	const material = new three__WEBPACK_IMPORTED_MODULE_6__.MeshBasicMaterial({
+	const geometry = new three__WEBPACK_IMPORTED_MODULE_7__.BoxGeometry(0.05, 0.05, 0.05);
+	const material = new three__WEBPACK_IMPORTED_MODULE_7__.MeshBasicMaterial({
 		color: isRecovered ? 0xff0000 : 0x00ff00,
 	});
-	const cube = new three__WEBPACK_IMPORTED_MODULE_6__.Mesh(geometry, material);
+	const cube = new three__WEBPACK_IMPORTED_MODULE_7__.Mesh(geometry, material);
 	anchor.add(cube);
 	console.log(
 		`anchor created (id: ${anchor.anchorID}, isPersistent: ${anchor.isPersistent}, isRecovered: ${isRecovered})`,
