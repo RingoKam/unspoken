@@ -27,7 +27,8 @@
     {
         "word": "FOOTBALL",
         "answer": "F",
-        "model": "/models/football.glb"
+        "model": "/models/football.glb",
+        "scale": "0.2"
     },
     {
         "word": "GUITAR",
