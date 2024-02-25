@@ -70808,9 +70808,7 @@ async function setupQuestion(data) {
 		anchorText.sync()
 	}
 
-	// TODO: instead of loading up the question one by one, 
-	// We should load all the question at once to speed things up?
-
+	//TODO: need to handle scaling a bit better here... :)
 	const gltf = questionModels[data.model]
 	const question = data.word.replace(data.answer, "_")
 
@@ -70840,9 +70838,7 @@ async function setupQuestion(data) {
 	aabb.setFromObject(model);
 
 	// from the box3, get the height of the model and scale it to 1
-	console.log(aabb.max.y)
-	const scale = 0.60 / aabb.max.y
-	console.log(scale)
+	const scale = data?.scale ? data.scale : 0.60 / aabb.max.y
 	model.scale.set(scale, scale, scale)
 
 	const height = (aabb.max.y - aabb.min.y) * scale / 2;
