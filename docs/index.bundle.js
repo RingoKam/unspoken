@@ -70611,7 +70611,8 @@ const successColor = new three__WEBPACK_IMPORTED_MODULE_7__.Color(0x66941B)
 const defaultColor = new three__WEBPACK_IMPORTED_MODULE_7__.Color(0x000000)
 
 // anchor model for the scene
-let anchorModel, anchorText;
+let anchorModel, anchorText, anchorTextGroup, anchorTextBackground;
+const anchorCharWidth = 3/4
 
 let questions = [];
 let questionModels = {}; // cache the question 3D models
@@ -70695,9 +70696,19 @@ function setupQuestionAnchor(anchor) {
 
 	const group = new three__WEBPACK_IMPORTED_MODULE_7__.Group();
 	anchorModel = new three__WEBPACK_IMPORTED_MODULE_7__.Group();
+	anchorTextGroup = new three__WEBPACK_IMPORTED_MODULE_7__.Group();	
 	anchorText = new troika_three_text__WEBPACK_IMPORTED_MODULE_10__.Text();
+	// With this background, lets put the text infront of it
+	anchorTextBackground = new three__WEBPACK_IMPORTED_MODULE_7__.Mesh(
+		new three__WEBPACK_IMPORTED_MODULE_7__.BoxGeometry(1, 0.1, 0.01), 
+		new three__WEBPACK_IMPORTED_MODULE_7__.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.5 })
+	);
+	anchorTextBackground.position.set(0, 0.6, -0.1);
+	anchorTextGroup.add(anchorTextBackground);
+	anchorTextGroup.add(anchorText);
 
-	group.add(anchorText);
+	console.log(anchorTextGroup)
+	group.add(anchorTextGroup);
 	group.add(anchorModel);
 
 	if (anchor !== null) {
@@ -70827,6 +70838,8 @@ async function setupQuestion(data) {
 	correctAnswer = data.answer
 	anchorText.text = question
 	anchorText.sync();
+	// TODO: for the anchor text, we need to add a background to it
+	
 
 	// remove the model inside anchorModel 
 	const model = gltf.scene;
@@ -70844,7 +70857,15 @@ async function setupQuestion(data) {
 	const height = (aabb.max.y - aabb.min.y) * scale / 2;
 	model.position.y = height;
 
-	anchorText.position.set(0, (aabb.max.y - aabb.min.y) * scale, -1)
+
+	// TODO: Compute bounding box of the text object
+	anchorTextGroup.position.set(0, (aabb.max.y - aabb.min.y) * scale, 0)
+	console.log(anchorText.position)
+	console.log(anchorTextBackground.position)
+	// scale based on the character 
+	const width = anchorCharWidth * question.length
+	anchorTextBackground.scale.set(width, 11, 1)
+	console.log(anchorTextGroup)
 
 	anchorModel.add(model);
 	animateIn(anchorModel).then(() => {
@@ -71199,6 +71220,8 @@ function endGame() {
 	animateOut(anchorModel).then(() => {
 		anchorModel.remove(anchorModel.children[0])
 		anchorText.text = "Thanks for Playing";
+		const width = anchorText.text.length * anchorCharWidth
+		anchorTextBackground.scale.set(width, 11, 1)
 		anchorText.sync();
 	})
 }
